@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Optimization Algorithm Playground</title>
+    <link rel="stylesheet" href="css/style.css">
+    <!-- Chart.js for analytics -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+                "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+            }
+        }
+    </script>
+</head>
+<body>
+
+    <div id="ui-panel">
+        <h1>Optimization Playground</h1>
+        
+        <!-- Algorithm Selection -->
+        <label>Algorithm:</label>
+        <select id="algorithm-select">
+            <option value="cuckoo">Cuckoo Search</option>
+            <option value="pso">Particle Swarm (PSO)</option>
+            <option value="ga">Genetic Algorithm</option>
+            <option value="sa">Simulated Annealing</option>
+            <option value="random">Random Search</option>
+        </select>
+
+        <!-- Landscape Selection -->
+        <label>Landscape:</label>
+        <select id="landscape-select">
+            <option value="ackley">Ackley ("Egg Carton")</option>
+            <option value="rosenbrock">Rosenbrock ("Banana Valley")</option>
+            <option value="rastrigin">Rastrigin ("Needle Field")</option>
+            <option value="sphere">Sphere ("The Bowl")</option>
+            <option value="schwefel">Schwefel ("Deceptive")</option>
+        </select>
+
+        <div id="analogy-box">
+            <strong>Info:</strong> <span id="analogy-text">Loading...</span>
+        </div>
+
+        <!-- Dynamic Controls Container -->
+        <div id="dynamic-controls"></div>
+
+        <!-- Common Stats -->
+        <div class="control-group">
+            <div class="stat-row"><span>Generation:</span> <span id="gen-count" class="highlight">0</span></div>
+            <div class="stat-row"><span>Best Fitness:</span> <span id="best-val" class="highlight">Infinity</span></div>
+        </div>
+
+        <!-- Global Settings -->
+        <div class="control-group">
+            <label>Population Size: <span id="val-popsize">50</span></label>
+            <input type="range" id="inp-popsize" min="10" max="200" step="10" value="50">
+            
+            <label>Speed: <span id="val-speed">30</span></label>
+            <input type="range" id="inp-speed" min="1" max="60" value="30">
+        </div>
+        
+        <div class="btn-container">
+            <button id="btn-toggle">Pause</button>
+            <button id="btn-reset">Reset</button>
+        </div>
+
+        <!-- Analytics Chart -->
+        <div class="chart-container">
+            <canvas id="fitness-chart"></canvas>
+        </div>
+    </div>
+
+    <div id="canvas-container"></div>
+
+    <script type="module" src="js/main.js"></script>
+</body>
+</html>

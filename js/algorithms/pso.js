@@ -1,0 +1,125 @@
+import { Algorithm } from './base.js';
+import { STATE, EVENTS } from '../config.js';
+
+export class PSO extends Algorithm {
+  constructor() {
+    super('pso');
+  }
+
+  init(landscape) {
+    this.particles = [];
+    this.best = { val: Infinity };
+    this.globalBest = { x: 0, z: 0, val: Infinity };
+    const b = landscape.bounds;
+
+    for (let i = 0; i < STATE.popSize; i++) {
+      const x = (Math.random() * 2 - 1) * b;
+      const z = (Math.random() * 2 - 1) * b;
+      const val = landscape.f(x, z);
+
+      // Random initial velocity
+      const vx = (Math.random() * 2 - 1) * (b * 0.1);
+      const vz = (Math.random() * 2 - 1) * (b * 0.1);
+
+      const p = {
+        x, z, val, vx, vz,
+        pBest: { x, z, val }, // Personal best
+        id: i
+      };
+      this.particles.push(p);
+
+      if (val < this.globalBest.val) this.globalBest = { x, z, val };
+    }
+    this.best = this.globalBest;
+  }
+
+  step(landscape) {
+    const p = STATE.algoParams.pso;
+    const w = p.w;  // Inertia
+    const c1 = p.c1; // Cognitive (self)
+    const c2 = p.c2; // Social (global)
+    const b = landscape.bounds;
+
+    for (let i = 0; i < this.particles.length; i++) {
+      const part = this.particles[i];
+
+      // Update Velocity
+      const r1 = Math.random();
+      const r2 = Math.random();
+
+      part.vx = w * part.vx +
+        c1 * r1 * (part.pBest.x - part.x) +
+        c2 * r2 * (this.globalBest.x - part.x);
+
+      part.vz = w * part.vz +
+        c1 * r1 * (part.pBest.z - part.z) +
+        c2 * r2 * (this.globalBest.z - part.z);
+
+      // Update Position
+      part.x += part.vx;
+      part.z += part.vz;
+
+      // Boundary handling (Clamp)
+      part.x = Math.max(-b, Math.min(b, part.x));
+      part.z = Math.max(-b, Math.min(b, part.z));
+
+      // Eval
+      part.val = landscape.f(part.x, part.z);
+
+      // Update Personal Best
+      if (part.val < part.pBest.val) {
+        part.pBest = { x: part.x, z: part.z, val: part.val };
+      }
+
+      // Update Global Best
+      if (part.val < this.globalBest.val) {
+        this.globalBest = { x: part.x, z: part.z, val: part.val };
+      }
+    }
+    this.best = this.globalBest;
+  }
+
+  getControlsHTML() {
+    const p = STATE.algoParams.pso;
+    return `
+            <div class="sub-control">
+                <label>Inertia (w): <span id="val-pso-w">${p.w}</span></label>
+                <input type="range" id="inp-pso-w" min="0" max="1" step="0.05" value="${p.w}">
+            </div>
+            <div class="sub-control">
+                <label>Cognitive (c1): <span id="val-pso-c1">${p.c1}</span></label>
+                <input type="range" id="inp-pso-c1" min="0" max="4" step="0.1" value="${p.c1}">
+            </div>
+            <div class="sub-control">
+                <label>Social (c2): <span id="val-pso-c2">${p.c2}</span></label>
+                <input type="range" id="inp-pso-c2" min="0" max="4" step="0.1" value="${p.c2}">
+            </div>
+        `;
+  }
+
+  updateParams(dom) {
+    const p = STATE.algoParams.pso;
+    const domW = dom.querySelector('#inp-pso-w');
+    const domC1 = dom.querySelector('#inp-pso-c1');
+    const domC2 = dom.querySelector('#inp-pso-c2');
+
+    if (domW) {
+      domW.addEventListener('input', e => {
+        p.w = parseFloat(e.target.value);
+        dom.querySelector('#val-pso-w').innerText = p.w.toFixed(2);
+      });
+    }
+    if (domC1) {
+      domC1.addEventListener('input', e => {
+        p.c1 = parseFloat(e.target.value);
+        dom.querySelector('#val-pso-c1').innerText = p.c1.toFixed(1);
+      });
+    }
+    if (domC2) {
+      domC2.addEventListener('input', e => {
+        p.c2 = parseFloat(e.target.value);
+        dom.querySelector('#val-pso-c2').innerText = p.c2.toFixed(1);
+      });
+    }
+  }
+}

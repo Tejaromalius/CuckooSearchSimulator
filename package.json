@@ -1,0 +1,12 @@
+{
+  "name": "optimization-playground",
+  "version": "1.0.0",
+  "description": "3D Optimization Algorithm Visualization",
+  "main": "js/main.js",
+  "scripts": {
+    "start": "npx serve ."
+  },
+  "dependencies": {
+    "serve": "^14.2.0"
+  }
+}
