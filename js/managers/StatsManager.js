@@ -1,57 +1,182 @@
 export class StatsManager {
   constructor() {
     this.ctx = document.getElementById('fitness-chart').getContext('2d');
+
+    // Multi-dataset support
     this.chart = new Chart(this.ctx, {
       type: 'line',
       data: {
         labels: [],
-        datasets: [{
-          label: 'Best Fitness',
-          data: [],
-          borderColor: '#00f260',
-          backgroundColor: 'rgba(0, 242, 96, 0.1)',
-          borderWidth: 2,
-          tension: 0.1,
-          pointRadius: 0
-        }]
+        datasets: []
       },
       options: {
         responsive: true,
         maintainAspectRatio: false,
         animation: false,
+        interaction: { mode: 'index', intersect: false },
         scales: {
-          x: { display: false },
+          x: { display: true, ticks: { color: '#666', maxTicksLimit: 10 } },
           y: {
             grid: { color: '#333' },
             ticks: { color: '#888', font: { size: 10 } }
           }
         },
         plugins: {
-          legend: { display: false }
+          legend: { display: true, labels: { color: '#aaa', boxWidth: 10 } },
+          tooltip: { mode: 'index', intersect: false }
         }
       }
     });
 
-    this.updateInterval = 5; // Update chart every 5 gens
+    this.runHistory = []; // For CSV export: { gen, best, avg, stdDev, success }
+    this.currentRunData = []; // Data for current chart line
+    this.runCount = 0;
+
+    this.updateInterval = 5;
   }
 
-  reset() {
-    this.chart.data.labels = [];
-    this.chart.data.datasets[0].data = [];
+  reset(keepPrevious) {
+    if (!keepPrevious) {
+      this.chart.data.datasets = [];
+      this.runCount = 0;
+    } else {
+      // Fade previous
+      if (this.chart.data.datasets.length > 0) {
+        const last = this.chart.data.datasets[this.chart.data.datasets.length - 1];
+        last.borderColor = 'rgba(100, 100, 100, 0.5)';
+        last.backgroundColor = 'transparent';
+        last.borderWidth = 1;
+      }
+    }
+
+    // Start new dataset
+    this.runCount++;
+    const newSet = {
+      label: `Run ${this.runCount}`,
+      data: [],
+      borderColor: '#00f260',
+      backgroundColor: 'rgba(0, 242, 96, 0.05)',
+      borderWidth: 2,
+      tension: 0.1,
+      pointRadius: 0
+    };
+    this.chart.data.datasets.push(newSet);
+
+    // sync labels if needed, or clear if fresh
+    if (!keepPrevious) this.chart.data.labels = [];
+
+    this.currentRunData = this.chart.data.datasets[this.chart.data.datasets.length - 1].data;
+    this.runHistory = [];
     this.chart.update();
   }
 
-  update(gen, bestVal) {
+  update(gen, particles, bestVal, targetStr) {
+    // 1. Calculate Stats
+    let sum = 0;
+    let sqSum = 0;
+    let successCount = 0;
+
+    // Parse target if possible (simple heuristic)
+    // Ideally pass target object, but string parsing for now is hacky but quick
+    // Actually, let's just use bestVal vs 0 or known optimum if possible
+    // For generalized success, we can check if fitness < epsilon (e.g. 1e-3)
+    const epsilon = 1e-2;
+
+    // Centroid for Explore/Exploit
+    let cx = 0, cz = 0;
+
+    particles.forEach(p => {
+      sum += p.val;
+      sqSum += p.val * p.val;
+
+      // Assuming 0 is always optimum-ish or close to it for our functions
+      // (Ackley, Rastrigin, Sphere, Rosenbrock(1,1)=0)
+      // Schwefel is the exception (min is 0 with our offset)
+      if (Math.abs(p.val) < epsilon) successCount++;
+
+      cx += p.x;
+      cz += p.z;
+    });
+
+    const N = particles.length;
+    const avg = sum / N;
+    const variance = (sqSum / N) - (avg * avg);
+    const stdDev = Math.sqrt(Math.max(0, variance));
+    const successRate = (successCount / N) * 100;
+
+    cx /= N;
+    cz /= N;
+
+    // Exploration: Avg distance from centroid
+    let distSum = 0;
+    particles.forEach(p => {
+      distSum += Math.sqrt((p.x - cx) ** 2 + (p.z - cz) ** 2);
+    });
+    const dispersion = distSum / N;
+
+    // 2. DOM Updates
+    const domAvg = document.getElementById('stat-avg');
+    const domStd = document.getElementById('stat-std');
+    const domSucc = document.getElementById('stat-succ');
+    const domDiv = document.getElementById('stat-div');
+
+    if (domAvg) domAvg.innerText = avg.toFixed(4);
+    if (domStd) domStd.innerText = stdDev.toFixed(4);
+    if (domSucc) domSucc.innerText = successRate.toFixed(1) + '%';
+    if (domDiv) domDiv.innerText = dispersion.toFixed(3);
+
+    // 3. Store History
+    this.runHistory.push({
+      gen,
+      best: bestVal,
+      avg,
+      stdDev,
+      success: successRate
+    });
+
+    // 4. Chart Update
     if (gen % this.updateInterval !== 0) return;
 
-    // Cap data points to avoid slow down
-    if (this.chart.data.labels.length > 100) {
-      this.chart.data.labels.shift();
-      this.chart.data.datasets[0].data.shift();
+    // Ensure labels exist
+    if (this.chart.data.labels.length <= this.currentRunData.length) {
+      this.chart.data.labels.push(gen);
     }
 
-    this.chart.data.labels.push(gen);
-    this.chart.data.datasets[0].data.push(bestVal);
-    this.chart.update('none'); // 'none' for performance
+    this.currentRunData.push(bestVal);
+
+    // Performance cap for long runs
+    if (this.currentRunData.length > 200) {
+      // Decimate? Or just shift? Shift is easier for now.
+      // If we shift, we must shift labels too, which breaks multi-run sync if they have diff lengths...
+      // Let's just stop updating graph after 200 points to save memory, or strictly shift everything.
+      // For simplicity in this demo: shift.
+      if (this.chart.data.labels.length > 200) {
+        this.chart.data.labels.shift();
+        this.chart.data.datasets.forEach(d => {
+          if (d.data.length > 200) d.data.shift();
+        });
+      }
+    }
+
+    this.chart.update('none');
+  }
+
+  exportCSV() {
+    if (this.runHistory.length === 0) return;
+
+    let csv = "Generation,BestFitness,AvgFitness,StdDev,SuccessRate\n";
+    this.runHistory.forEach(r => {
+      csv += `${r.gen},${r.best},${r.avg},${r.stdDev},${r.success}\n`;
+    });
+
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.setAttribute('hidden', '');
+    a.setAttribute('href', url);
+    a.setAttribute('download', `simulation_run_${Date.now()}.csv`);
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
   }
 }

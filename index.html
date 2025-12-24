@@ -48,10 +48,13 @@
         <!-- Dynamic Controls Container -->
         <div id="dynamic-controls"></div>
 
-        <!-- Common Stats -->
+        <!-- Stats Dashboard -->
         <div class="control-group">
-            <div class="stat-row"><span>Generation:</span> <span id="gen-count" class="highlight">0</span></div>
-            <div class="stat-row"><span>Best Fitness:</span> <span id="best-val" class="highlight">Infinity</span></div>
+            <label style="color: #ff9800; font-weight: bold; margin-bottom: 8px;">Statistics</label>
+            <div class="stat-row"><span>Avg Fitness:</span> <span id="stat-avg" class="highlight">0</span></div>
+            <div class="stat-row"><span>Std Dev (Diversity):</span> <span id="stat-std" class="highlight">0</span></div>
+            <div class="stat-row"><span>Success Rate:</span> <span id="stat-succ" class="highlight">0%</span></div>
+            <div class="stat-row"><span>Dispersion:</span> <span id="stat-div" class="highlight">0</span></div>
         </div>
 
         <!-- Global Settings -->
@@ -61,12 +64,23 @@
             
             <label>Speed: <span id="val-speed">30</span></label>
             <input type="range" id="inp-speed" min="1" max="60" value="30">
+
+            <div style="margin-top: 10px; display: flex; align-items: center; gap: 8px;">
+                <input type="checkbox" id="chk-heatmap">
+                <label for="chk-heatmap" style="margin:0; cursor:pointer;">Show Heatmap Overlay</label>
+            </div>
+            <div style="margin-top: 5px; display: flex; align-items: center; gap: 8px;">
+                <input type="checkbox" id="chk-history">
+                <label for="chk-history" style="margin:0; cursor:pointer;">Keep Previous Run on Chart</label>
+            </div>
         </div>
         
         <div class="btn-container">
             <button id="btn-toggle">Pause</button>
             <button id="btn-reset">Reset</button>
         </div>
+        
+        <button id="btn-export" style="width:100%; margin-bottom: 20px; background: #222; border-color: #666; font-size: 0.8rem;">📥 Export Data (CSV)</button>
 
         <!-- Analytics Chart -->
         <div class="chart-container">

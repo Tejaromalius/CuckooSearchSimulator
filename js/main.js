@@ -19,6 +19,7 @@ import { RandomSearch } from './algorithms/random.js';
 import { TerrainManager } from './managers/TerrainManager.js';
 import { PopulationManager } from './managers/PopulationManager.js';
 import { StatsManager } from './managers/StatsManager.js';
+import { HeatmapManager } from './managers/HeatmapManager.js';
 
 const LANDSCAPES = {
   ackley: new Ackley(),
@@ -46,6 +47,7 @@ addLights(scene);
 const terrainMgr = new TerrainManager(scene);
 const popMgr = new PopulationManager(scene);
 const statsMgr = new StatsManager();
+const heatmapMgr = new HeatmapManager(scene);
 
 // App State
 let activeLandscape = LANDSCAPES.ackley;
@@ -56,6 +58,8 @@ function switchLandscape(id) {
   activeLandscape = LANDSCAPES[id];
   STATE.currentLandscape = id;
   terrainMgr.setLandscape(activeLandscape);
+  heatmapMgr.reset();
+  heatmapMgr.buildMesh(activeLandscape); // Rebuild heatmap plane
 
   // Update Analogy
   document.getElementById('analogy-text').textContent = activeLandscape.analogy;
@@ -95,8 +99,12 @@ function reset() {
   STATE.genCount = 0;
   activeAlgorithm.init(activeLandscape);
   popMgr.init(activeAlgorithm.particles);
-  statsMgr.reset();
-  updateControls(); // Refresh controls in case params need sync
+
+  const keepPrev = document.getElementById('chk-history').checked;
+  statsMgr.reset(keepPrev);
+  heatmapMgr.reset();
+
+  updateControls();
 }
 
 // --- DOM HANDLERS ---
@@ -109,6 +117,11 @@ document.getElementById('btn-toggle').addEventListener('click', e => {
   e.target.innerText = STATE.isRunning ? "Pause" : "Play";
   e.target.classList.toggle('active');
   controls.autoRotate = STATE.isRunning;
+});
+document.getElementById('btn-export').addEventListener('click', () => statsMgr.exportCSV());
+
+document.getElementById('chk-heatmap').addEventListener('change', e => {
+  heatmapMgr.setEnabled(e.target.checked, activeLandscape);
 });
 
 // Global Params
@@ -126,6 +139,7 @@ document.getElementById('inp-speed').addEventListener('input', e => {
 // Helper for dynamic param events (bubbled from modules)
 document.addEventListener(EVENTS.UPDATE_PARAMS, () => {
   terrainMgr.rebuild();
+  heatmapMgr.buildMesh(activeLandscape);
   reset();
 });
 
@@ -148,12 +162,13 @@ function animate(time) {
   if (STATE.isRunning && time - lastTime > speedLimit) {
     activeAlgorithm.step(activeLandscape);
     popMgr.update(activeAlgorithm.particles, activeLandscape, activeAlgorithm.best);
+    heatmapMgr.update(activeAlgorithm.particles, activeLandscape);
 
     // Update stats
     STATE.genCount++;
-    document.getElementById('gen-count').innerText = STATE.genCount;
-    document.getElementById('best-val').innerText = activeAlgorithm.best.val.toFixed(5);
-    statsMgr.update(STATE.genCount, activeAlgorithm.best.val);
+    // document.getElementById('gen-count').innerText = STATE.genCount; // Removed from HTML? Check later.
+    // Actually keep getting stats update
+    statsMgr.update(STATE.genCount, activeAlgorithm.particles, activeAlgorithm.best.val);
 
     lastTime = time;
   }
