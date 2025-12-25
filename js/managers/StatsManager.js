@@ -19,17 +19,21 @@ export class StatsManager {
         scales: {
           x: {
             display: true,
-            ticks: { color: '#666', maxTicksLimit: 10 },
-            title: { display: true, text: 'Generations', color: '#666', font: { size: 11 } }
+            ticks: { color: '#666', maxTicksLimit: 8, font: { size: 9 } },
+            title: { display: true, text: 'Generations', color: '#666', font: { size: 10 } }
           },
           y: {
             grid: { color: '#333' },
-            ticks: { color: '#888', font: { size: 10 } },
-            title: { display: true, text: 'Best Fitness Cost', color: '#888', font: { size: 11 } }
+            ticks: { color: '#888', font: { size: 9 } },
+            title: { display: true, text: 'Fitness', color: '#888', font: { size: 10 } }
           }
         },
         plugins: {
-          legend: { display: true, labels: { color: '#aaa', boxWidth: 10 } },
+          legend: {
+            display: true,
+            position: 'top',
+            labels: { color: '#aaa', boxWidth: 8, font: { size: 10 }, padding: 5 }
+          },
           tooltip: {
             mode: 'index',
             intersect: false,
