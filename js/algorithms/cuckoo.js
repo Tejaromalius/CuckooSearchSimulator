@@ -41,19 +41,21 @@ export class CuckooSearch extends Algorithm {
       // Lévy step using Mantegna's method
       const sigma = Math.pow(
         (MathUtils.gamma(1 + beta) * Math.sin((Math.PI * beta) / 2)) /
-          (MathUtils.gamma((1 + beta) / 2) *
-            beta *
-            Math.pow(2, (beta - 1) / 2)),
+        (MathUtils.gamma((1 + beta) / 2) *
+          beta *
+          Math.pow(2, (beta - 1) / 2)),
         1 / beta,
       );
-      const u = MathUtils.normalRandom() * sigma;
-      const v = MathUtils.normalRandom();
-      const stepMag = u / Math.pow(Math.abs(v), 1 / beta);
+      const getLevyStep = () => {
+        const u = MathUtils.normalRandom() * sigma;
+        const v = MathUtils.normalRandom();
+        return u / Math.pow(Math.abs(v), 1 / beta);
+      };
 
-      // Apply to random direction (isotropic 2D Lévy flight)
-      const angle = RNG.next() * 2 * Math.PI;
-      const stepX = stepMag * Math.cos(angle) * jumpScale;
-      const stepZ = stepMag * Math.sin(angle) * jumpScale;
+      // Standard Coordinate-wise Lévy Flight
+      // Independent steps for each dimension
+      const stepX = getLevyStep() * jumpScale;
+      const stepZ = getLevyStep() * jumpScale;
 
       let nx = Math.max(-b, Math.min(b, current.x + stepX));
       let nz = Math.max(-b, Math.min(b, current.z + stepZ));
