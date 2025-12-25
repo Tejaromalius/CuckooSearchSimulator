@@ -145,7 +145,7 @@ document.getElementById('btn-toggle').addEventListener('click', e => {
   STATE.isRunning = !STATE.isRunning;
   e.target.innerText = STATE.isRunning ? "Pause" : "Play";
   e.target.classList.toggle('active');
-  controls.autoRotate = STATE.isRunning;
+  // Auto-rotation is now manual via checkbox
 });
 document.getElementById('btn-export').addEventListener('click', () => statsMgr.exportCSV());
 
@@ -157,6 +157,10 @@ document.getElementById('chk-heatmap').addEventListener('change', e => {
   } else {
     terrainMgr.setHeatmap(null);
   }
+});
+
+document.getElementById('chk-autorotate').addEventListener('change', e => {
+  controls.autoRotate = e.target.checked;
 });
 
 // Global Params

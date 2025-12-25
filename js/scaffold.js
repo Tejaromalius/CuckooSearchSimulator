@@ -25,7 +25,7 @@ export function createRenderer(containerId) {
 export function createControls(camera, domElement) {
   const controls = new OrbitControls(camera, domElement);
   controls.enableDamping = true;
-  controls.autoRotate = true;
+  controls.autoRotate = false;
   controls.autoRotateSpeed = 0.5;
   return controls;
 }

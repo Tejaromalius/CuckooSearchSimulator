@@ -6,7 +6,7 @@ export const CONSTANTS = {
 export const STATE = {
   popSize: 50,
   speed: 30, // frames per second cap (approx)
-  isRunning: true,
+  isRunning: false,
   genCount: 0,
   epsilon: 0.1, // Success threshold
   currentAlgorithm: 'cuckoo',
