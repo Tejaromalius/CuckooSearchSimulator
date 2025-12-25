@@ -35,21 +35,20 @@ export class CuckooSearch extends Algorithm {
       const current = this.particles[i];
       const jumpScale = CONSTANTS.levyScale * (b / 3);
 
-      // Levy step
-      const u = MathUtils.normalRandom() * Math.pow(
+      // Lévy step using Mantegna's method
+      const sigma = Math.pow(
         (MathUtils.gamma(1 + beta) * Math.sin(Math.PI * beta / 2)) /
         (MathUtils.gamma((1 + beta) / 2) * beta * Math.pow(2, (beta - 1) / 2)),
         1 / beta
       );
+      const u = MathUtils.normalRandom() * sigma;
       const v = MathUtils.normalRandom();
       const stepMag = u / Math.pow(Math.abs(v), 1 / beta);
 
-      const stepX = stepMag * jumpScale;
-      const stepZ = stepMag * jumpScale; // Simplified 2D Levy
-
-      // Actually, correct Levy is usually direction * step_length
-      // But individual component Levy is a common simplification in these demos
-      // Let's stick to the previous implementation for consistency
+      // Apply to random direction (isotropic 2D Lévy flight)
+      const angle = Math.random() * 2 * Math.PI;
+      const stepX = stepMag * Math.cos(angle) * jumpScale;
+      const stepZ = stepMag * Math.sin(angle) * jumpScale;
 
       let nx = Math.max(-b, Math.min(b, current.x + stepX));
       let nz = Math.max(-b, Math.min(b, current.z + stepZ));
