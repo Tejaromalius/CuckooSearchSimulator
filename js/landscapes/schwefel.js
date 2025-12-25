@@ -7,14 +7,13 @@ export class Schwefel extends Landscape {
   }
 
   f(x, z) {
-    // f(x) = 418.9829*n - sum(x_i sin(sqrt(|x_i|)))
-    // We use a scaled version to center it better visually or keep standard bounds
-    const scale = STATE.landscapeParams.schwefel.scale;
-    const term1 = x * Math.sin(Math.sqrt(Math.abs(x)));
-    const term2 = z * Math.sin(Math.sqrt(Math.abs(z)));
-    // Inverting so minimum is at bottom for consistency in our visualization (usually we look for min)
-    // Schwefel min is at 420.9687
-    return scale * 2 - (term1 + term2);
+    const p = STATE.landscapeParams.schwefel;
+    const freq = p.freq || 1.0;
+    const term1 = x * Math.sin(Math.sqrt(Math.abs(x * freq)));
+    const term2 = z * Math.sin(Math.sqrt(Math.abs(z * freq)));
+
+    // Using scale from STATE as the vertical constant
+    return p.scale * 2 - (term1 + term2);
   }
 
   get bounds() {
@@ -37,8 +36,37 @@ export class Schwefel extends Landscape {
   }
 
   getControlsHTML() {
-    return `<div style="font-size: 0.8rem; color: #aaa; font-style: italic;">Standard Schwefel function. Bounds +/- 500.</div>`;
+    const p = STATE.landscapeParams.schwefel;
+    return `
+            <div class="sub-control">
+                <label>Vertical Offset: <span id="val-schwefel-scale">${p.scale.toFixed(0)}</span></label>
+                <input type="range" id="inp-schwefel-scale" min="200" max="600" step="10" value="${p.scale}">
+            </div>
+            <div class="sub-control">
+                <label>Frequency (Waviness): <span id="val-schwefel-freq">${(p.freq || 1.0).toFixed(2)}</span></label>
+                <input type="range" id="inp-schwefel-freq" min="0.5" max="2.0" step="0.05" value="${p.freq || 1.0}">
+            </div>
+        `;
   }
 
-  updateParams(dom) { }
+  updateParams(dom) {
+    const p = STATE.landscapeParams.schwefel;
+    const domScale = dom.querySelector('#inp-schwefel-scale');
+    const domFreq = dom.querySelector('#inp-schwefel-freq');
+
+    if (domScale) {
+      domScale.addEventListener('input', (e) => {
+        p.scale = parseFloat(e.target.value);
+        dom.querySelector('#val-schwefel-scale').innerText = p.scale.toFixed(0);
+        document.dispatchEvent(new Event(EVENTS.UPDATE_PARAMS));
+      });
+    }
+    if (domFreq) {
+      domFreq.addEventListener('input', (e) => {
+        p.freq = parseFloat(e.target.value);
+        dom.querySelector('#val-schwefel-freq').innerText = p.freq.toFixed(2);
+        document.dispatchEvent(new Event(EVENTS.UPDATE_PARAMS));
+      });
+    }
+  }
 }
