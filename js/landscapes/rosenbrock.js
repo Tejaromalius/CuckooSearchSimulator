@@ -12,7 +12,7 @@ export class Rosenbrock extends Landscape {
   }
 
   get bounds() {
-    return 2.0;
+    return 2.5;
   }
   get hScale() {
     return 0.01;

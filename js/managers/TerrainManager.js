@@ -80,7 +80,11 @@ export class TerrainManager {
     // Cache values to avoid double calculation
     const heightMap = new Float32Array(pos.count);
     for (let i = 0; i < pos.count; i++) {
-      const val = l.f(pos.getX(i), pos.getY(i));
+      // Correct coordinate mapping:
+      // Plane X = World X
+      // Plane Y = World -Z
+      // Therefore, to get f(x, z), we pass (pos.getX, -pos.getY)
+      const val = l.f(pos.getX(i), -pos.getY(i));
       heightMap[i] = val;
       if (val > maxVal) maxVal = val;
       if (val < minVal) minVal = val;
