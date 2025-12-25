@@ -27,11 +27,15 @@ export class Landscape {
     return '(0,0)';
   }
 
+  get globalMinVal() {
+    return 0;
+  }
+
   // HTML string for controls
   getControlsHTML() {
     return '';
   }
 
   // Handle parameter updates from DOM
-  updateParams(domElement) {}
+  updateParams(domElement) { }
 }

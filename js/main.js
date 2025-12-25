@@ -419,6 +419,7 @@ document.getElementById('btn-step').addEventListener('click', () => {
     STATE.genCount,
     activeAlgorithm.particles,
     activeAlgorithm.best.val,
+    activeLandscape,
   );
 });
 document
@@ -702,6 +703,7 @@ function animate(time) {
       STATE.genCount,
       activeAlgorithm.particles,
       activeAlgorithm.best.val,
+      activeLandscape,
     );
 
     lastTime = time;

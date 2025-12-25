@@ -251,19 +251,20 @@ export class StatsManager {
     }
   }
 
-  update(gen, particles, bestVal, targetStr) {
+  update(gen, particles, bestVal, landscape) {
     // 1. Calculate Stats
     let sum = 0;
     let sqSum = 0;
     let successCount = 0;
     const epsilon = STATE.epsilon;
+    const fStar = landscape ? landscape.globalMinVal : 0;
     let cx = 0,
       cz = 0;
 
     particles.forEach((p) => {
       sum += p.val;
       sqSum += p.val * p.val;
-      if (Math.abs(p.val) < epsilon) successCount++;
+      if (Math.abs(p.val - fStar) < epsilon) successCount++;
       cx += p.x;
       cz += p.z;
     });
@@ -354,13 +355,13 @@ export class StatsManager {
       const seed = m.seed || 0;
       const algoParams = m.algoParams
         ? Object.entries(m.algoParams)
-            .map(([key, val]) => `${key}=${val}`)
-            .join(';')
+          .map(([key, val]) => `${key}=${val}`)
+          .join(';')
         : 'none';
       const landParams = m.landParams
         ? Object.entries(m.landParams)
-            .map(([key, val]) => `${key}=${val}`)
-            .join(';')
+          .map(([key, val]) => `${key}=${val}`)
+          .join(';')
         : 'none';
 
       run.data.forEach((r) => {
