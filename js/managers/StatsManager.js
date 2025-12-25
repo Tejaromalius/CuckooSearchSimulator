@@ -1,3 +1,5 @@
+import { STATE } from '../config.js';
+
 export class StatsManager {
   constructor() {
     this.ctx = document.getElementById('fitness-chart').getContext('2d');
@@ -28,7 +30,15 @@ export class StatsManager {
         },
         plugins: {
           legend: { display: true, labels: { color: '#aaa', boxWidth: 10 } },
-          tooltip: { mode: 'index', intersect: false }
+          tooltip: {
+            mode: 'index',
+            intersect: false,
+            callbacks: {
+              label: function (context) {
+                return context.dataset.label + ': ' + context.parsed.y.toFixed(3);
+              }
+            }
+          }
         }
       }
     });
@@ -93,8 +103,9 @@ export class StatsManager {
     // Parse target if possible (simple heuristic)
     // Ideally pass target object, but string parsing for now is hacky but quick
     // Actually, let's just use bestVal vs 0 or known optimum if possible
-    // For generalized success, we can check if fitness < epsilon (e.g. 1e-3)
-    const epsilon = 1e-2;
+    // For generalized success, we can check if fitness < epsilon
+    // Relaxed threshold for visualization satisfaction (Parametric)
+    const epsilon = STATE.epsilon;
 
     // Centroid for Explore/Exploit
     let cx = 0, cz = 0;

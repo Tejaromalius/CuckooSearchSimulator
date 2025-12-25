@@ -8,6 +8,7 @@ export const STATE = {
   speed: 30, // frames per second cap (approx)
   isRunning: true,
   genCount: 0,
+  epsilon: 0.1, // Success threshold
   currentAlgorithm: 'cuckoo',
   currentLandscape: 'ackley',
 

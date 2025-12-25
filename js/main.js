@@ -167,6 +167,12 @@ document.getElementById('inp-speed').addEventListener('input', e => {
   document.getElementById('val-speed').innerText = STATE.speed;
 });
 
+document.getElementById('inp-epsilon').addEventListener('input', e => {
+  STATE.epsilon = parseFloat(e.target.value);
+  document.getElementById('val-epsilon').innerText = STATE.epsilon.toFixed(3);
+  // No need to reset(), stats update on next frame
+});
+
 // Helper for dynamic param events (bubbled from modules)
 document.addEventListener(EVENTS.UPDATE_PARAMS, () => {
   terrainMgr.rebuild();
