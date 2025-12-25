@@ -1,6 +1,6 @@
 export const CONSTANTS = {
   beta: 1.5,
-  levyScale: 0.2
+  levyScale: 0.2,
 };
 
 export const STATE = {
@@ -18,7 +18,7 @@ export const STATE = {
     rosenbrock: { a: 1.0, b: 100 },
     rastrigin: { A: 10 },
     sphere: {},
-    schwefel: { scale: 420.9687 }
+    schwefel: { scale: 420.9687 },
   },
 
   // Dynamic params for algorithms
@@ -27,11 +27,11 @@ export const STATE = {
     pso: { w: 0.7, c1: 1.5, c2: 1.5 }, // Inertia, cognitive, social
     ga: { mutationRate: 0.1, crossoverRate: 0.8 },
     sa: { temp: 1000, coolingRate: 0.99 },
-    random: {}
-  }
+    random: {},
+  },
 };
 
 export const EVENTS = {
   RESET: 'reset',
-  UPDATE_PARAMS: 'update_params'
+  UPDATE_PARAMS: 'update_params',
 };

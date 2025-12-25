@@ -13,12 +13,24 @@ export class Ackley extends Landscape {
     return term1 + term2 + p.a + Math.E;
   }
 
-  get bounds() { return 5; }
-  get hScale() { return 0.8; }
-  get visOffset() { return 0; }
-  get colors() { return [0x1e3c72, 0xff4b4b]; } // Blue to Red
-  get analogy() { return "Many smooth 'cups' trap solutions. Cuckoos need Lévy Flights to jump out of local cups towards the deep center."; }
-  get target() { return "(0.0, 0.0)"; }
+  get bounds() {
+    return 5;
+  }
+  get hScale() {
+    return 0.8;
+  }
+  get visOffset() {
+    return 0;
+  }
+  get colors() {
+    return [0x1e3c72, 0xff4b4b];
+  } // Blue to Red
+  get analogy() {
+    return "Many smooth 'cups' trap solutions. Cuckoos need Lévy Flights to jump out of local cups towards the deep center.";
+  }
+  get target() {
+    return '(0.0, 0.0)';
+  }
 
   getControlsHTML() {
     const p = STATE.landscapeParams.ackley;
@@ -45,21 +57,21 @@ export class Ackley extends Landscape {
     const domC = dom.querySelector('#inp-ackley-c');
 
     if (domA) {
-      domA.addEventListener('input', e => {
+      domA.addEventListener('input', (e) => {
         p.a = parseFloat(e.target.value);
         dom.querySelector('#val-ackley-a').innerText = p.a;
         document.dispatchEvent(new Event(EVENTS.UPDATE_PARAMS));
       });
     }
     if (domB) {
-      domB.addEventListener('input', e => {
+      domB.addEventListener('input', (e) => {
         p.b = parseFloat(e.target.value);
         dom.querySelector('#val-ackley-b').innerText = p.b.toFixed(2);
         document.dispatchEvent(new Event(EVENTS.UPDATE_PARAMS));
       });
     }
     if (domC) {
-      domC.addEventListener('input', e => {
+      domC.addEventListener('input', (e) => {
         p.c = parseFloat(e.target.value);
         dom.querySelector('#val-ackley-c').innerText = p.c.toFixed(2);
         document.dispatchEvent(new Event(EVENTS.UPDATE_PARAMS));

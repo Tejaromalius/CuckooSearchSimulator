@@ -9,7 +9,7 @@ export class StatsManager {
       type: 'line',
       data: {
         labels: [],
-        datasets: []
+        datasets: [],
       },
       options: {
         responsive: true,
@@ -20,31 +20,48 @@ export class StatsManager {
           x: {
             display: true,
             ticks: { color: '#666', maxTicksLimit: 8, font: { size: 9 } },
-            title: { display: true, text: 'Generations', color: '#666', font: { size: 10 } }
+            title: {
+              display: true,
+              text: 'Generations',
+              color: '#666',
+              font: { size: 10 },
+            },
           },
           y: {
             grid: { color: '#333' },
             ticks: { color: '#888', font: { size: 9 } },
-            title: { display: true, text: 'Fitness', color: '#888', font: { size: 10 } }
-          }
+            title: {
+              display: true,
+              text: 'Fitness',
+              color: '#888',
+              font: { size: 10 },
+            },
+          },
         },
         plugins: {
           legend: {
             display: true,
             position: 'top',
-            labels: { color: '#aaa', boxWidth: 8, font: { size: 10 }, padding: 5 }
+            labels: {
+              color: '#aaa',
+              boxWidth: 8,
+              font: { size: 10 },
+              padding: 5,
+            },
           },
           tooltip: {
             mode: 'index',
             intersect: false,
             callbacks: {
               label: function (context) {
-                return context.dataset.label + ': ' + context.parsed.y.toFixed(3);
-              }
-            }
-          }
-        }
-      }
+                return (
+                  context.dataset.label + ': ' + context.parsed.y.toFixed(3)
+                );
+              },
+            },
+          },
+        },
+      },
     });
 
     this.runHistory = []; // For CSV export: { gen, best, avg, stdDev, success }
@@ -62,7 +79,7 @@ export class StatsManager {
       this.allRunsHistory.push({
         runId: this.runCount,
         meta: this.currentMetadata,
-        data: [...this.runHistory]
+        data: [...this.runHistory],
       });
     }
 
@@ -75,7 +92,8 @@ export class StatsManager {
     } else {
       // Fade previous runs but keep their color distinction
       if (this.chart.data.datasets.length > 0) {
-        const last = this.chart.data.datasets[this.chart.data.datasets.length - 1];
+        const last =
+          this.chart.data.datasets[this.chart.data.datasets.length - 1];
         last.borderWidth = 1;
         last.pointRadius = 0;
       }
@@ -96,14 +114,15 @@ export class StatsManager {
       backgroundColor: bg,
       borderWidth: 2,
       tension: 0.1,
-      pointRadius: 0
+      pointRadius: 0,
     };
     this.chart.data.datasets.push(newSet);
 
     // sync labels if needed, or clear if fresh
     if (!keepPrevious) this.chart.data.labels = [];
 
-    this.currentRunData = this.chart.data.datasets[this.chart.data.datasets.length - 1].data;
+    this.currentRunData =
+      this.chart.data.datasets[this.chart.data.datasets.length - 1].data;
     this.runHistory = [];
     this.chart.update();
   }
@@ -122,9 +141,10 @@ export class StatsManager {
     const epsilon = STATE.epsilon;
 
     // Centroid for Explore/Exploit
-    let cx = 0, cz = 0;
+    let cx = 0,
+      cz = 0;
 
-    particles.forEach(p => {
+    particles.forEach((p) => {
       sum += p.val;
       sqSum += p.val * p.val;
 
@@ -139,7 +159,7 @@ export class StatsManager {
 
     const N = particles.length;
     const avg = sum / N;
-    const variance = (sqSum / N) - (avg * avg);
+    const variance = sqSum / N - avg * avg;
     const stdDev = Math.sqrt(Math.max(0, variance));
     const successRate = (successCount / N) * 100;
 
@@ -148,7 +168,7 @@ export class StatsManager {
 
     // Exploration: Avg distance from centroid
     let distSum = 0;
-    particles.forEach(p => {
+    particles.forEach((p) => {
       distSum += Math.sqrt((p.x - cx) ** 2 + (p.z - cz) ** 2);
     });
     const dispersion = distSum / N;
@@ -170,7 +190,7 @@ export class StatsManager {
       best: bestVal,
       avg,
       stdDev,
-      success: successRate
+      success: successRate,
     });
 
     // 4. Chart Update
@@ -191,7 +211,7 @@ export class StatsManager {
       // For simplicity in this demo: shift.
       if (this.chart.data.labels.length > 200) {
         this.chart.data.labels.shift();
-        this.chart.data.datasets.forEach(d => {
+        this.chart.data.datasets.forEach((d) => {
           if (d.data.length > 200) d.data.shift();
         });
       }
@@ -209,23 +229,24 @@ export class StatsManager {
       allData.push({
         runId: this.runCount,
         meta: this.currentMetadata,
-        data: this.runHistory
+        data: this.runHistory,
       });
     }
 
     if (allData.length === 0) return;
 
     // Enhanced CSV Header
-    let csv = "RunID,Algorithm,Landscape,PopSize,Epsilon,Generation,BestFitness,AvgFitness,StdDev,SuccessRate\n";
+    let csv =
+      'RunID,Algorithm,Landscape,PopSize,Epsilon,Generation,BestFitness,AvgFitness,StdDev,SuccessRate\n';
 
-    allData.forEach(run => {
+    allData.forEach((run) => {
       const m = run.meta || {};
       const algo = m.algorithm || 'unknown';
       const land = m.landscape || 'unknown';
       const pop = m.popSize || 0;
       const eps = m.epsilon || 0;
 
-      run.data.forEach(r => {
+      run.data.forEach((r) => {
         csv += `${run.runId},${algo},${land},${pop},${eps},${r.gen},${r.best},${r.avg},${r.stdDev},${r.success}\n`;
       });
     });

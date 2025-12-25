@@ -80,20 +80,24 @@ export class HeatmapManager {
     // Use a "splat" radius to smooth out the visits
     const gridScale = this.gridSize / size;
 
-    particles.forEach(p => {
-      // Convert world pos to grid pos 
+    particles.forEach((p) => {
+      // Convert world pos to grid pos
       const gx = Math.floor((p.x + b) * gridScale);
       const gz = Math.floor((p.z + b) * gridScale);
 
       if (gx >= 0 && gx < this.gridSize && gz >= 0 && gz < this.gridSize) {
-
         // Simple 3x3 Gaussian-like distribution
         for (let ox = -1; ox <= 1; ox++) {
           for (let oz = -1; oz <= 1; oz++) {
             const nx = gx + ox;
             const nz = gz + oz;
 
-            if (nx >= 0 && nx < this.gridSize && nz >= 0 && nz < this.gridSize) {
+            if (
+              nx >= 0 &&
+              nx < this.gridSize &&
+              nz >= 0 &&
+              nz < this.gridSize
+            ) {
               const weight = (2 - Math.abs(ox)) * (2 - Math.abs(oz)) * 2.5; // Normal weight
               const idx = nz * this.gridSize + nx;
               this.grid[idx] += weight;
@@ -143,7 +147,10 @@ export class HeatmapManager {
       }
 
       // 2. Map Intensity to RGB
-      let r = 0, g = 0, b = 0, a = 0;
+      let r = 0,
+        g = 0,
+        b = 0,
+        a = 0;
 
       if (intensity > 0) {
         // Apply a minimum alpha so even faint trails are seen

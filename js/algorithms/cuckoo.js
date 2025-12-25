@@ -17,9 +17,11 @@ export class CuckooSearch extends Algorithm {
       const z = (Math.random() * 2 - 1) * b;
       const val = landscape.f(x, z);
       this.particles.push({
-        x, z, val,
+        x,
+        z,
+        val,
         id: i,
-        isNest: true // For visual differentiation later
+        isNest: true, // For visual differentiation later
       });
       if (val < this.best.val) this.best = { x, z, val };
     }
@@ -37,9 +39,11 @@ export class CuckooSearch extends Algorithm {
 
       // Lévy step using Mantegna's method
       const sigma = Math.pow(
-        (MathUtils.gamma(1 + beta) * Math.sin(Math.PI * beta / 2)) /
-        (MathUtils.gamma((1 + beta) / 2) * beta * Math.pow(2, (beta - 1) / 2)),
-        1 / beta
+        (MathUtils.gamma(1 + beta) * Math.sin((Math.PI * beta) / 2)) /
+          (MathUtils.gamma((1 + beta) / 2) *
+            beta *
+            Math.pow(2, (beta - 1) / 2)),
+        1 / beta,
       );
       const u = MathUtils.normalRandom() * sigma;
       const v = MathUtils.normalRandom();
@@ -65,7 +69,9 @@ export class CuckooSearch extends Algorithm {
 
     // 2. Abandonment
     // Sort to find worst
-    const sorted = this.particles.map((p, i) => ({ val: p.val, idx: i })).sort((a, b) => b.val - a.val);
+    const sorted = this.particles
+      .map((p, i) => ({ val: p.val, idx: i }))
+      .sort((a, b) => b.val - a.val);
     const numAbandon = Math.floor(this.particles.length * Pa);
 
     for (let k = 0; k < numAbandon; k++) {
@@ -81,7 +87,7 @@ export class CuckooSearch extends Algorithm {
     }
 
     // 3. Update Best
-    this.particles.forEach(p => {
+    this.particles.forEach((p) => {
       if (p.val < this.best.val) this.best = { x: p.x, z: p.z, val: p.val };
     });
   }
@@ -101,7 +107,7 @@ export class CuckooSearch extends Algorithm {
     const p = STATE.algoParams.cuckoo;
     const start = dom.querySelector('#inp-pa');
     if (start) {
-      start.addEventListener('input', e => {
+      start.addEventListener('input', (e) => {
         p.pa = parseFloat(e.target.value);
         dom.querySelector('#val-pa').innerText = p.pa.toFixed(2);
       });

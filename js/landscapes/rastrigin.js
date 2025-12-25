@@ -11,15 +11,31 @@ export class Rastrigin extends Landscape {
     // f(x) = An + sum(x_i^2 - A cos(2pi x_i))
     // Here n=2
     const A = p.A;
-    return A * 2 + (x ** 2 - A * Math.cos(2 * Math.PI * x)) + (z ** 2 - A * Math.cos(2 * Math.PI * z));
+    return (
+      A * 2 +
+      (x ** 2 - A * Math.cos(2 * Math.PI * x)) +
+      (z ** 2 - A * Math.cos(2 * Math.PI * z))
+    );
   }
 
-  get bounds() { return 5.12; }
-  get hScale() { return 0.2; }
-  get visOffset() { return 0; }
-  get colors() { return [0x4b0082, 0xffa500]; } // Indigo to Orange
-  get analogy() { return "A field of needles. Hundreds of local minima. Extremely difficult for hill-climbers, requiring significant exploration."; }
-  get target() { return "(0, 0)"; }
+  get bounds() {
+    return 5.12;
+  }
+  get hScale() {
+    return 0.2;
+  }
+  get visOffset() {
+    return 0;
+  }
+  get colors() {
+    return [0x4b0082, 0xffa500];
+  } // Indigo to Orange
+  get analogy() {
+    return 'A field of needles. Hundreds of local minima. Extremely difficult for hill-climbers, requiring significant exploration.';
+  }
+  get target() {
+    return '(0, 0)';
+  }
 
   getControlsHTML() {
     const p = STATE.landscapeParams.rastrigin;
@@ -37,7 +53,7 @@ export class Rastrigin extends Landscape {
     const domA = dom.querySelector('#inp-rast-A');
 
     if (domA) {
-      domA.addEventListener('input', e => {
+      domA.addEventListener('input', (e) => {
         p.A = parseInt(e.target.value);
         dom.querySelector('#val-rast-A').innerText = p.A;
         document.dispatchEvent(new Event(EVENTS.UPDATE_PARAMS));

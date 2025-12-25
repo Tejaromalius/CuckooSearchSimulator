@@ -55,16 +55,17 @@ export class GeneticAlgorithm extends Algorithm {
       childZ = Math.max(-b, Math.min(b, childZ));
 
       newPop.push({
-        x: childX, z: childZ,
+        x: childX,
+        z: childZ,
         val: landscape.f(childX, childZ),
-        id: newPop.length
+        id: newPop.length,
       });
     }
 
     this.particles = newPop;
 
     // Update Best
-    this.particles.forEach(pt => {
+    this.particles.forEach((pt) => {
       if (pt.val < this.best.val) this.best = { x: pt.x, z: pt.z, val: pt.val };
     });
   }
@@ -72,7 +73,8 @@ export class GeneticAlgorithm extends Algorithm {
   tournamentSelect(k) {
     let best = null;
     for (let i = 0; i < k; i++) {
-      const ind = this.particles[Math.floor(Math.random() * this.particles.length)];
+      const ind =
+        this.particles[Math.floor(Math.random() * this.particles.length)];
       if (best === null || ind.val < best.val) best = ind;
     }
     return best;
@@ -98,15 +100,16 @@ export class GeneticAlgorithm extends Algorithm {
     const domCross = dom.querySelector('#inp-ga-cross');
 
     if (domMut) {
-      domMut.addEventListener('input', e => {
+      domMut.addEventListener('input', (e) => {
         p.mutationRate = parseFloat(e.target.value);
         dom.querySelector('#val-ga-mut').innerText = p.mutationRate.toFixed(2);
       });
     }
     if (domCross) {
-      domCross.addEventListener('input', e => {
+      domCross.addEventListener('input', (e) => {
         p.crossoverRate = parseFloat(e.target.value);
-        dom.querySelector('#val-ga-cross').innerText = p.crossoverRate.toFixed(2);
+        dom.querySelector('#val-ga-cross').innerText =
+          p.crossoverRate.toFixed(2);
       });
     }
   }

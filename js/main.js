@@ -1,4 +1,10 @@
-import { createScene, createCamera, createRenderer, createControls, addLights } from './scaffold.js';
+import {
+  createScene,
+  createCamera,
+  createRenderer,
+  createControls,
+  addLights,
+} from './scaffold.js';
 import { STATE, CONSTANTS, EVENTS } from './config.js';
 
 // Landscapes
@@ -26,7 +32,7 @@ const LANDSCAPES = {
   rosenbrock: new Rosenbrock(),
   rastrigin: new Rastrigin(),
   sphere: new Sphere(),
-  schwefel: new Schwefel()
+  schwefel: new Schwefel(),
 };
 
 const ALGORITHMS = {
@@ -34,7 +40,7 @@ const ALGORITHMS = {
   pso: new PSO(),
   ga: new GeneticAlgorithm(),
   sa: new SimulatedAnnealing(),
-  random: new RandomSearch()
+  random: new RandomSearch(),
 };
 
 // --- INIT ---
@@ -62,7 +68,10 @@ function switchLandscape(id) {
   STATE.currentLandscape = id;
   terrainMgr.setLandscape(activeLandscape);
   heatmapMgr.reset();
-  heatmapMgr.setEnabled(document.getElementById('chk-heatmap').checked, activeLandscape);
+  heatmapMgr.setEnabled(
+    document.getElementById('chk-heatmap').checked,
+    activeLandscape,
+  );
   if (heatmapMgr.enabled) {
     terrainMgr.setHeatmap(heatmapMgr.getTexture());
   } else {
@@ -89,13 +98,17 @@ function updateControls() {
   // Algorithm Controls
   const algoDiv = document.createElement('div');
   algoDiv.className = 'control-group';
-  algoDiv.innerHTML = `<label style="color:#00f260; font-weight:bold;">${activeAlgorithm.id.toUpperCase()} Params</label>` + activeAlgorithm.getControlsHTML();
+  algoDiv.innerHTML =
+    `<label style="color:#00f260; font-weight:bold;">${activeAlgorithm.id.toUpperCase()} Params</label>` +
+    activeAlgorithm.getControlsHTML();
   container.appendChild(algoDiv);
 
   // Landscape Controls
   const landDiv = document.createElement('div');
   landDiv.className = 'control-group';
-  landDiv.innerHTML = `<label style="color:#4facfe; font-weight:bold;">${activeLandscape.id.toUpperCase()} Params</label>` + activeLandscape.getControlsHTML();
+  landDiv.innerHTML =
+    `<label style="color:#4facfe; font-weight:bold;">${activeLandscape.id.toUpperCase()} Params</label>` +
+    activeLandscape.getControlsHTML();
   container.appendChild(landDiv);
 
   // Bind events
@@ -113,7 +126,7 @@ function reset(keepPrevious = false) {
     algorithm: STATE.currentAlgorithm,
     landscape: STATE.currentLandscape,
     popSize: STATE.popSize,
-    epsilon: STATE.epsilon
+    epsilon: STATE.epsilon,
   };
   statsMgr.reset(keepPrevious, meta);
   heatmapMgr.reset();
@@ -123,8 +136,11 @@ function reset(keepPrevious = false) {
 
 // --- MOBILE OPTIMIZATIONS ---
 function isMobileDevice() {
-  return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
-    || window.innerWidth <= 768;
+  return (
+    /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+      navigator.userAgent,
+    ) || window.innerWidth <= 768
+  );
 }
 
 // Adjust population size for mobile performance
@@ -140,35 +156,42 @@ if (isMobileDevice()) {
 }
 
 // --- DOM HANDLERS ---
-document.getElementById('landscape-select').addEventListener('change', e => switchLandscape(e.target.value));
-document.getElementById('algorithm-select').addEventListener('change', e => switchAlgorithm(e.target.value));
+document
+  .getElementById('landscape-select')
+  .addEventListener('change', (e) => switchLandscape(e.target.value));
+document
+  .getElementById('algorithm-select')
+  .addEventListener('change', (e) => switchAlgorithm(e.target.value));
 
 document.getElementById('btn-reset').addEventListener('click', () => {
   STATE.keepHistory = false;
-  document.getElementById('btn-compare').innerText = "📊 Compare Current Algorithm";
-  document.getElementById('btn-compare').style.background = ""; // Reset style
+  document.getElementById('btn-compare').innerText =
+    '📊 Compare Current Algorithm';
+  document.getElementById('btn-compare').style.background = ''; // Reset style
   reset(false);
 });
 
 document.getElementById('btn-compare').addEventListener('click', (e) => {
   STATE.keepHistory = true;
-  e.target.innerText = "Comparing... (Reset to Exit)";
-  e.target.style.background = "#00f260";
-  e.target.style.color = "#000";
-  // Do NOT called reset(true) here. 
-  // We just enable the mode. The actual reset/save happens when 
+  e.target.innerText = 'Comparing... (Reset to Exit)';
+  e.target.style.background = '#00f260';
+  e.target.style.color = '#000';
+  // Do NOT called reset(true) here.
+  // We just enable the mode. The actual reset/save happens when
   // the user changes a parameter or clicks Reset manually.
 });
 
-document.getElementById('btn-toggle').addEventListener('click', e => {
+document.getElementById('btn-toggle').addEventListener('click', (e) => {
   STATE.isRunning = !STATE.isRunning;
-  e.target.innerText = STATE.isRunning ? "Pause" : "Play";
+  e.target.innerText = STATE.isRunning ? 'Pause' : 'Play';
   e.target.classList.toggle('active');
   // Auto-rotation is now manual via checkbox
 });
-document.getElementById('btn-export').addEventListener('click', () => statsMgr.exportCSV());
+document
+  .getElementById('btn-export')
+  .addEventListener('click', () => statsMgr.exportCSV());
 
-document.getElementById('chk-heatmap').addEventListener('change', e => {
+document.getElementById('chk-heatmap').addEventListener('change', (e) => {
   const enabled = e.target.checked;
   heatmapMgr.setEnabled(enabled, activeLandscape);
   if (enabled) {
@@ -178,13 +201,13 @@ document.getElementById('chk-heatmap').addEventListener('change', e => {
   }
 });
 
-document.getElementById('chk-autorotate').addEventListener('change', e => {
+document.getElementById('chk-autorotate').addEventListener('change', (e) => {
   controls.autoRotate = e.target.checked;
 });
 
 // Global Params
 const popSlider = document.getElementById('inp-popsize');
-popSlider.addEventListener('input', e => {
+popSlider.addEventListener('input', (e) => {
   STATE.popSize = parseInt(e.target.value);
   document.getElementById('val-popsize').innerText = STATE.popSize;
 });
@@ -192,12 +215,12 @@ popSlider.addEventListener('change', () => {
   reset(STATE.keepHistory);
 });
 
-document.getElementById('inp-speed').addEventListener('input', e => {
+document.getElementById('inp-speed').addEventListener('input', (e) => {
   STATE.speed = parseInt(e.target.value);
   document.getElementById('val-speed').innerText = STATE.speed;
 });
 
-document.getElementById('inp-epsilon').addEventListener('input', e => {
+document.getElementById('inp-epsilon').addEventListener('input', (e) => {
   STATE.epsilon = parseFloat(e.target.value);
   document.getElementById('val-epsilon').innerText = STATE.epsilon.toFixed(3);
   // No need to reset(), stats update on next frame
@@ -230,16 +253,22 @@ function animate(time) {
   const speedLimit = 1000 / STATE.speed;
   if (STATE.isRunning && time - lastTime > speedLimit) {
     activeAlgorithm.step(activeLandscape);
-    popMgr.update(activeAlgorithm.particles, activeLandscape, activeAlgorithm.best);
+    popMgr.update(
+      activeAlgorithm.particles,
+      activeLandscape,
+      activeAlgorithm.best,
+    );
     heatmapMgr.update(activeAlgorithm.particles, activeLandscape);
-
-
 
     // Update stats
     STATE.genCount++;
     // document.getElementById('gen-count').innerText = STATE.genCount; // Removed from HTML? Check later.
     // Actually keep getting stats update
-    statsMgr.update(STATE.genCount, activeAlgorithm.particles, activeAlgorithm.best.val);
+    statsMgr.update(
+      STATE.genCount,
+      activeAlgorithm.particles,
+      activeAlgorithm.best.val,
+    );
 
     lastTime = time;
   }

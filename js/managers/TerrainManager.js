@@ -54,14 +54,17 @@ export class TerrainManager {
       const val = l.f(pos.getX(i), pos.getY(i));
 
       // Visual Height
-      pos.setZ(i, (val * l.hScale) + l.visOffset);
+      pos.setZ(i, val * l.hScale + l.visOffset);
 
       // Color Interpolation
       let t = 0;
       if (l.id === 'rosenbrock' || l.id === 'schwefel') {
         const safeVal = Math.max(val, 0.0001);
         if (maxVal === minVal) t = 0;
-        else t = (Math.log(safeVal) - Math.log(Math.max(minVal, 0.0001))) / (Math.log(maxVal) - Math.log(Math.max(minVal, 0.0001)));
+        else
+          t =
+            (Math.log(safeVal) - Math.log(Math.max(minVal, 0.0001))) /
+            (Math.log(maxVal) - Math.log(Math.max(minVal, 0.0001)));
       } else {
         t = (val - minVal) / (maxVal - minVal || 1);
       }
@@ -80,7 +83,7 @@ export class TerrainManager {
       roughness: 0.6,
       metalness: 0.1,
       side: THREE.DoubleSide,
-      transparent: false // Important: Base is opaque
+      transparent: false, // Important: Base is opaque
     });
 
     this.mesh = new THREE.Mesh(geo, mat);
@@ -95,7 +98,7 @@ export class TerrainManager {
       side: THREE.DoubleSide,
       depthWrite: false, // Prevents z-fighting and ensures overlay behavior
       color: 0xffffff,
-      alphaTest: 0 // No alpha test needed, use proper blending
+      alphaTest: 0, // No alpha test needed, use proper blending
     });
 
     this.heatmapMesh = new THREE.Mesh(geo, overlayMat); // Re-use geometry

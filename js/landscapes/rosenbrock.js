@@ -11,11 +11,21 @@ export class Rosenbrock extends Landscape {
     return Math.pow(p.a - x, 2) + p.b * Math.pow(z - Math.pow(x, 2), 2);
   }
 
-  get bounds() { return 2.0; }
-  get hScale() { return 0.01; } // Dampened because values explode
-  get visOffset() { return 0.5; }
-  get colors() { return [0x004400, 0xffff00]; } // Green valley, yellow peaks
-  get analogy() { return "A long, curved valley. The walls are steep. Easy to find the valley floor, but hard to find the minimum at (a, a²)."; }
+  get bounds() {
+    return 2.0;
+  }
+  get hScale() {
+    return 0.01;
+  } // Dampened because values explode
+  get visOffset() {
+    return 0.5;
+  }
+  get colors() {
+    return [0x004400, 0xffff00];
+  } // Green valley, yellow peaks
+  get analogy() {
+    return 'A long, curved valley. The walls are steep. Easy to find the valley floor, but hard to find the minimum at (a, a²).';
+  }
   get target() {
     const p = STATE.landscapeParams.rosenbrock;
     return `(${p.a.toFixed(1)}, ${(p.a ** 2).toFixed(1)})`;
@@ -41,14 +51,14 @@ export class Rosenbrock extends Landscape {
     const domB = dom.querySelector('#inp-rosen-b');
 
     if (domA) {
-      domA.addEventListener('input', e => {
+      domA.addEventListener('input', (e) => {
         p.a = parseFloat(e.target.value);
         dom.querySelector('#val-rosen-a').innerText = p.a.toFixed(1);
         document.dispatchEvent(new Event(EVENTS.UPDATE_PARAMS));
       });
     }
     if (domB) {
-      domB.addEventListener('input', e => {
+      domB.addEventListener('input', (e) => {
         p.b = parseInt(e.target.value);
         dom.querySelector('#val-rosen-b').innerText = p.b;
         document.dispatchEvent(new Event(EVENTS.UPDATE_PARAMS));

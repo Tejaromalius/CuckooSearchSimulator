@@ -17,16 +17,28 @@ export class Schwefel extends Landscape {
     return scale * 2 - (term1 + term2);
   }
 
-  get bounds() { return 500; }
-  get hScale() { return 0.01; }
-  get visOffset() { return 0; }
-  get colors() { return [0x800000, 0xffffff]; } // Maroon to White
-  get analogy() { return "A deceptive landscape. The global minimum is far at the edge, deep in a valley, while other deep valleys exist far away."; }
-  get target() { return "(420.97, 420.97)"; }
+  get bounds() {
+    return 500;
+  }
+  get hScale() {
+    return 0.01;
+  }
+  get visOffset() {
+    return 0;
+  }
+  get colors() {
+    return [0x800000, 0xffffff];
+  } // Maroon to White
+  get analogy() {
+    return 'A deceptive landscape. The global minimum is far at the edge, deep in a valley, while other deep valleys exist far away.';
+  }
+  get target() {
+    return '(420.97, 420.97)';
+  }
 
   getControlsHTML() {
     return `<div style="font-size: 0.8rem; color: #aaa; font-style: italic;">Standard Schwefel function. Bounds +/- 500.</div>`;
   }
 
-  updateParams(dom) { }
+  updateParams(dom) {}
 }

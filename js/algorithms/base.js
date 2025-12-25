@@ -5,11 +5,13 @@ export class Algorithm {
     this.best = { x: 0, z: 0, val: Infinity };
   }
 
-  init(landscape) { }
+  init(landscape) {}
 
-  step(landscape) { }
+  step(landscape) {}
 
-  getControlsHTML() { return ""; }
+  getControlsHTML() {
+    return '';
+  }
 
-  updateParams(dom) { }
+  updateParams(dom) {}
 }

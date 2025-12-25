@@ -22,9 +22,13 @@ export class PSO extends Algorithm {
       const vz = (Math.random() * 2 - 1) * (b * 0.1);
 
       const p = {
-        x, z, val, vx, vz,
+        x,
+        z,
+        val,
+        vx,
+        vz,
         pBest: { x, z, val }, // Personal best
-        id: i
+        id: i,
       };
       this.particles.push(p);
 
@@ -35,7 +39,7 @@ export class PSO extends Algorithm {
 
   step(landscape) {
     const p = STATE.algoParams.pso;
-    const w = p.w;  // Inertia
+    const w = p.w; // Inertia
     const c1 = p.c1; // Cognitive (self)
     const c2 = p.c2; // Social (global)
     const b = landscape.bounds;
@@ -44,14 +48,18 @@ export class PSO extends Algorithm {
       const part = this.particles[i];
 
       // Update Velocity (independent random values per dimension)
-      const r1x = Math.random(), r1z = Math.random();
-      const r2x = Math.random(), r2z = Math.random();
+      const r1x = Math.random(),
+        r1z = Math.random();
+      const r2x = Math.random(),
+        r2z = Math.random();
 
-      part.vx = w * part.vx +
+      part.vx =
+        w * part.vx +
         c1 * r1x * (part.pBest.x - part.x) +
         c2 * r2x * (this.globalBest.x - part.x);
 
-      part.vz = w * part.vz +
+      part.vz =
+        w * part.vz +
         c1 * r1z * (part.pBest.z - part.z) +
         c2 * r2z * (this.globalBest.z - part.z);
 
@@ -104,19 +112,19 @@ export class PSO extends Algorithm {
     const domC2 = dom.querySelector('#inp-pso-c2');
 
     if (domW) {
-      domW.addEventListener('input', e => {
+      domW.addEventListener('input', (e) => {
         p.w = parseFloat(e.target.value);
         dom.querySelector('#val-pso-w').innerText = p.w.toFixed(2);
       });
     }
     if (domC1) {
-      domC1.addEventListener('input', e => {
+      domC1.addEventListener('input', (e) => {
         p.c1 = parseFloat(e.target.value);
         dom.querySelector('#val-pso-c1').innerText = p.c1.toFixed(1);
       });
     }
     if (domC2) {
-      domC2.addEventListener('input', e => {
+      domC2.addEventListener('input', (e) => {
         p.c2 = parseFloat(e.target.value);
         dom.querySelector('#val-pso-c2').innerText = p.c2.toFixed(1);
       });

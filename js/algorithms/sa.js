@@ -42,7 +42,7 @@ export class SimulatedAnnealing extends Algorithm {
       const cz = Math.max(-b, Math.min(b, nz));
       const nVal = landscape.f(cx, cz);
 
-      // Acceptance 
+      // Acceptance
       const delta = nVal - curr.val;
       if (delta < 0 || Math.random() < Math.exp(-delta / this.currentTemp)) {
         curr.x = cx;
@@ -79,14 +79,14 @@ export class SimulatedAnnealing extends Algorithm {
     const domCool = dom.querySelector('#inp-sa-cool');
 
     if (domTemp) {
-      domTemp.addEventListener('input', e => {
+      domTemp.addEventListener('input', (e) => {
         p.temp = parseInt(e.target.value);
         dom.querySelector('#val-sa-temp').innerText = p.temp;
         // Don't reset currentTemp because it disrupts the run, but next reset will pick it up
       });
     }
     if (domCool) {
-      domCool.addEventListener('input', e => {
+      domCool.addEventListener('input', (e) => {
         p.coolingRate = parseFloat(e.target.value);
         dom.querySelector('#val-sa-cool').innerText = p.coolingRate.toFixed(3);
       });

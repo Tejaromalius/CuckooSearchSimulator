@@ -36,6 +36,8 @@ export class RandomSearch extends Algorithm {
     }
   }
 
-  getControlsHTML() { return `<div style="font-size:0.8rem;">Just pure luck.</div>`; }
-  updateParams(dom) { }
+  getControlsHTML() {
+    return `<div style="font-size:0.8rem;">Just pure luck.</div>`;
+  }
+  updateParams(dom) {}
 }
