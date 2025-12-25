@@ -44,26 +44,36 @@ export class StatsManager {
     });
 
     this.runHistory = []; // For CSV export: { gen, best, avg, stdDev, success }
+    this.allRunsHistory = []; // Store past runs for consolidated export
     this.currentRunData = []; // Data for current chart line
+    this.currentMetadata = {}; // Metadata for the active run
     this.runCount = 0;
 
     this.updateInterval = 5;
   }
 
-  reset(keepPrevious) {
+  reset(keepPrevious, meta = {}) {
+    // Save current run before resetting
+    if (this.runHistory.length > 0) {
+      this.allRunsHistory.push({
+        runId: this.runCount,
+        meta: this.currentMetadata,
+        data: [...this.runHistory]
+      });
+    }
+
+    this.currentMetadata = meta; // Set new metadata
+
     if (!keepPrevious) {
       this.chart.data.datasets = [];
       this.runCount = 0;
+      this.allRunsHistory = []; // Hard reset clears all history
     } else {
       // Fade previous runs but keep their color distinction
       if (this.chart.data.datasets.length > 0) {
         const last = this.chart.data.datasets[this.chart.data.datasets.length - 1];
-        // Keep the hue but reduce opacity/width
-        // Assuming borderColor is HSLA or RGBA, we just make it thinner
         last.borderWidth = 1;
         last.pointRadius = 0;
-        // Optionally fade opacity if it was 1.0
-        // last.borderColor = last.borderColor.replace('1)', '0.4)');
       }
     }
 
@@ -187,11 +197,33 @@ export class StatsManager {
   }
 
   exportCSV() {
-    if (this.runHistory.length === 0) return;
+    // Combine current run with history
+    const allData = [...this.allRunsHistory];
 
-    let csv = "Generation,BestFitness,AvgFitness,StdDev,SuccessRate\n";
-    this.runHistory.forEach(r => {
-      csv += `${r.gen},${r.best},${r.avg},${r.stdDev},${r.success}\n`;
+    // Add active run if it has data
+    if (this.runHistory.length > 0) {
+      allData.push({
+        runId: this.runCount,
+        meta: this.currentMetadata,
+        data: this.runHistory
+      });
+    }
+
+    if (allData.length === 0) return;
+
+    // Enhanced CSV Header
+    let csv = "RunID,Algorithm,Landscape,PopSize,Epsilon,Generation,BestFitness,AvgFitness,StdDev,SuccessRate\n";
+
+    allData.forEach(run => {
+      const m = run.meta || {};
+      const algo = m.algorithm || 'unknown';
+      const land = m.landscape || 'unknown';
+      const pop = m.popSize || 0;
+      const eps = m.epsilon || 0;
+
+      run.data.forEach(r => {
+        csv += `${run.runId},${algo},${land},${pop},${eps},${r.gen},${r.best},${r.avg},${r.stdDev},${r.success}\n`;
+      });
     });
 
     const blob = new Blob([csv], { type: 'text/csv' });
@@ -199,7 +231,7 @@ export class StatsManager {
     const a = document.createElement('a');
     a.setAttribute('hidden', '');
     a.setAttribute('href', url);
-    a.setAttribute('download', `simulation_run_${Date.now()}.csv`);
+    a.setAttribute('download', `simulation_multi_run_V${Date.now()}.csv`);
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);

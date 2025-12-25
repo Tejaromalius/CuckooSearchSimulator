@@ -107,7 +107,14 @@ function reset(keepPrevious = false) {
   activeAlgorithm.init(activeLandscape);
   popMgr.init(activeAlgorithm.particles);
 
-  statsMgr.reset(keepPrevious);
+  // Capture metadata for the run
+  const meta = {
+    algorithm: STATE.currentAlgorithm,
+    landscape: STATE.currentLandscape,
+    popSize: STATE.popSize,
+    epsilon: STATE.epsilon
+  };
+  statsMgr.reset(keepPrevious, meta);
   heatmapMgr.reset();
 
   updateControls();
