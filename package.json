@@ -4,7 +4,8 @@
   "description": "3D Optimization Algorithm Visualization",
   "main": "js/main.js",
   "scripts": {
-    "start": "npx serve ."
+    "start": "npx serve .",
+    "format": "npx prettier -w js/ css/ index.html"
   },
   "dependencies": {
     "serve": "^14.2.0"
