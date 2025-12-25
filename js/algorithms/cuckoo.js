@@ -36,7 +36,10 @@ export class CuckooSearch extends Algorithm {
     // 1. Lévy Flights
     for (let i = 0; i < this.particles.length; i++) {
       const current = this.particles[i];
-      const jumpScale = CONSTANTS.levyScale * (b / 3);
+      // Adjusted scale to prevent excessive boundary clamping on large domains (e.g. Schwefel)
+      // Previously (b / 3), now (b * 0.01) to keep steps closer to local search with occasional long jumps
+      // Uses Dynamic control from STATE
+      const jumpScale = STATE.algoParams.cuckoo.levyScale * (b * 0.01);
 
       // Lévy step using Mantegna's method
       const sigma = Math.pow(
@@ -109,17 +112,28 @@ export class CuckooSearch extends Algorithm {
                 <label>Discovery Rate (Pa): <span id="val-pa">${p.pa}</span></label>
                 <input type="range" id="inp-pa" min="0" max="1" step="0.05" value="${p.pa}">
             </div>
-            <div style="font-size: 0.75rem; color: #888;">Fraction of nests abandoned each generation.</div>
+            <div class="sub-control">
+                <label>Lévy Multiple: <span id="val-levy">${p.levyScale}</span></label>
+                <input type="range" id="inp-levy" min="0.1" max="5.0" step="0.1" value="${p.levyScale}">
+            </div>
+            <div style="font-size: 0.75rem; color: #888;">Fraction abandoned & Jump step multiplier.</div>
         `;
   }
 
   updateParams(dom) {
     const p = STATE.algoParams.cuckoo;
     const start = dom.querySelector('#inp-pa');
+    const levy = dom.querySelector('#inp-levy');
     if (start) {
       start.addEventListener('input', (e) => {
         p.pa = parseFloat(e.target.value);
         dom.querySelector('#val-pa').innerText = p.pa.toFixed(2);
+      });
+    }
+    if (levy) {
+      levy.addEventListener('input', (e) => {
+        p.levyScale = parseFloat(e.target.value);
+        dom.querySelector('#val-levy').innerText = p.levyScale.toFixed(1);
       });
     }
   }

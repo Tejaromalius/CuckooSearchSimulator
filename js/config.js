@@ -24,7 +24,7 @@ export const STATE = {
 
   // Dynamic params for algorithms
   algoParams: {
-    cuckoo: { pa: 0.25 },
+    cuckoo: { pa: 0.25, levyScale: 0.2 },
     pso: { w: 0.7, c1: 1.5, c2: 1.5 }, // Inertia, cognitive, social
     ga: { mutationRate: 0.1, crossoverRate: 0.8 },
     sa: { temp: 1000, coolingRate: 0.99 },
