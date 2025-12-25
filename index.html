@@ -35,6 +35,9 @@
       </div>
     </div>
 
+    <!-- Tooltip for Statistics -->
+    <div id="stat-tooltip" class="stat-tooltip"></div>
+
     <div id="app-container">
       <div id="canvas-container">
         <button id="btn-fullscreen" aria-label="Toggle Fullscreen">⛶</button>
@@ -92,19 +95,38 @@
           <label style="color: #ff9800; font-weight: bold; margin-bottom: 8px"
             >Statistics</label
           >
-          <div class="stat-row">
+          <div
+            class="stat-row stat-clickable"
+            data-tooltip="Average fitness value across all particles in the current population. Lower is better for minimization problems."
+          >
             <span>Avg Fitness:</span>
             <span id="stat-avg" class="highlight">0</span>
           </div>
-          <div class="stat-row">
+          <div
+            class="stat-row stat-clickable"
+            data-tooltip="Best (lowest) fitness value found so far during the entire simulation run."
+          >
+            <span>Best Fitness:</span>
+            <span id="stat-best" class="highlight">∞</span>
+          </div>
+          <div
+            class="stat-row stat-clickable"
+            data-tooltip="Standard deviation of fitness values. Higher values indicate more diversity in the population, while lower values suggest convergence."
+          >
             <span>Std Dev (Diversity):</span>
             <span id="stat-std" class="highlight">0</span>
           </div>
-          <div class="stat-row">
+          <div
+            class="stat-row stat-clickable"
+            data-tooltip="Percentage of particles within ε (epsilon) distance from the global optimum. Higher is better."
+          >
             <span>Success Rate:</span>
             <span id="stat-succ" class="highlight">0%</span>
           </div>
-          <div class="stat-row">
+          <div
+            class="stat-row stat-clickable"
+            data-tooltip="Spatial spread of particles across the landscape. Measures how far particles are from their centroid."
+          >
             <span>Dispersion:</span>
             <span id="stat-div" class="highlight">0</span>
           </div>

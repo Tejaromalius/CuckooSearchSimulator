@@ -314,6 +314,52 @@ document.addEventListener(EVENTS.UPDATE_PARAMS, () => {
   reset(STATE.keepHistory);
 });
 
+// --- STATISTICS TOOLTIP FUNCTIONALITY ---
+const tooltip = document.getElementById('stat-tooltip');
+const statRows = document.querySelectorAll('.stat-clickable');
+
+statRows.forEach((row) => {
+  row.addEventListener('click', (e) => {
+    const tooltipText = row.getAttribute('data-tooltip');
+    if (!tooltipText) return;
+
+    tooltip.textContent = tooltipText;
+    tooltip.classList.add('visible');
+
+    // Position tooltip near the clicked element
+    const rect = row.getBoundingClientRect();
+    tooltip.style.left = `${rect.left + rect.width / 2}px`;
+    tooltip.style.top = `${rect.top - 10}px`;
+    tooltip.style.transform = 'translate(-50%, -100%)';
+
+    // Auto-hide after 4 seconds
+    setTimeout(() => {
+      tooltip.classList.remove('visible');
+    }, 4000);
+  });
+});
+
+// Hide tooltip when clicking elsewhere
+document.addEventListener('click', (e) => {
+  if (!e.target.closest('.stat-clickable')) {
+    tooltip.classList.remove('visible');
+  }
+});
+
+// --- PORTRAIT FULLSCREEN BUTTON ---
+const portraitFullscreenBtn = document.getElementById(
+  'btn-portrait-fullscreen',
+);
+if (portraitFullscreenBtn) {
+  portraitFullscreenBtn.addEventListener('click', () => {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen().catch((err) => {
+        console.error(`Error attempting to enable fullscreen: ${err.message}`);
+      });
+    }
+  });
+}
+
 // Resize
 window.addEventListener('resize', () => {
   const width = canvasContainer.clientWidth;

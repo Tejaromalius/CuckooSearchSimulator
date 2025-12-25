@@ -123,6 +123,49 @@ h1 {
   font-weight: bold;
 }
 
+.stat-clickable {
+  cursor: help;
+  padding: 4px 6px;
+  border-radius: 4px;
+  transition: background-color 0.2s ease;
+}
+
+.stat-clickable:hover {
+  background-color: rgba(79, 172, 254, 0.1);
+}
+
+.stat-clickable:active {
+  background-color: rgba(79, 172, 254, 0.2);
+}
+
+/* Tooltip for Statistics */
+.stat-tooltip {
+  position: fixed;
+  background: rgba(20, 30, 40, 0.98);
+  color: #fff;
+  padding: 12px 16px;
+  border-radius: 8px;
+  border: 1px solid #4facfe;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  max-width: 280px;
+  z-index: 10000;
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(-8px);
+  transition:
+    opacity 0.2s ease,
+    transform 0.2s ease;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.stat-tooltip.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
 /* ===== FORM CONTROLS ===== */
 select {
   width: 100%;

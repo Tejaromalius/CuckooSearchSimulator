@@ -69,6 +69,7 @@ export class StatsManager {
     this.currentRunData = []; // Data for current chart line
     this.currentMetadata = {}; // Metadata for the active run
     this.runCount = 0;
+    this.bestFitness = Infinity; // Track best fitness across all generations
 
     this.updateInterval = 5;
   }
@@ -124,6 +125,7 @@ export class StatsManager {
     this.currentRunData =
       this.chart.data.datasets[this.chart.data.datasets.length - 1].data;
     this.runHistory = [];
+    this.bestFitness = Infinity; // Reset best fitness for new run
     this.chart.update();
   }
 
@@ -175,11 +177,18 @@ export class StatsManager {
 
     // 2. DOM Updates
     const domAvg = document.getElementById('stat-avg');
+    const domBest = document.getElementById('stat-best');
     const domStd = document.getElementById('stat-std');
     const domSucc = document.getElementById('stat-succ');
     const domDiv = document.getElementById('stat-div');
 
+    // Update best fitness if current is better
+    if (bestVal < this.bestFitness) {
+      this.bestFitness = bestVal;
+    }
+
     if (domAvg) domAvg.innerText = avg.toFixed(4);
+    if (domBest) domBest.innerText = this.bestFitness.toFixed(4);
     if (domStd) domStd.innerText = stdDev.toFixed(4);
     if (domSucc) domSucc.innerText = successRate.toFixed(1) + '%';
     if (domDiv) domDiv.innerText = dispersion.toFixed(3);

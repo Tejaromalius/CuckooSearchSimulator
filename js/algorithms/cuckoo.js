@@ -44,9 +44,9 @@ export class CuckooSearch extends Algorithm {
       // Lévy step using Mantegna's method
       const sigma = Math.pow(
         (MathUtils.gamma(1 + beta) * Math.sin((Math.PI * beta) / 2)) /
-        (MathUtils.gamma((1 + beta) / 2) *
-          beta *
-          Math.pow(2, (beta - 1) / 2)),
+          (MathUtils.gamma((1 + beta) / 2) *
+            beta *
+            Math.pow(2, (beta - 1) / 2)),
         1 / beta,
       );
       const getLevyStep = () => {
