@@ -287,6 +287,7 @@ export class StatsManager {
     const domStd = document.getElementById('stat-std');
     const domSucc = document.getElementById('stat-succ');
     const domDiv = document.getElementById('stat-div');
+    const domGen = document.getElementById('stat-gen');
 
     if (bestVal < this.bestFitness) {
       this.bestFitness = bestVal;
@@ -297,6 +298,7 @@ export class StatsManager {
     if (domStd) domStd.innerText = stdDev.toFixed(4);
     if (domSucc) domSucc.innerText = successRate.toFixed(1) + '%';
     if (domDiv) domDiv.innerText = dispersion.toFixed(3);
+    if (domGen) domGen.innerText = gen;
 
     // 3. Store History
     this.runHistory.push({
@@ -352,8 +354,8 @@ export class StatsManager {
       const seed = m.seed || 0;
       const algoParams = m.algoParams
         ? Object.entries(m.algoParams)
-            .map(([key, val]) => `${key}=${val}`)
-            .join(';')
+          .map(([key, val]) => `${key}=${val}`)
+          .join(';')
         : 'none';
 
       run.data.forEach((r) => {
