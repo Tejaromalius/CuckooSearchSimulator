@@ -81,16 +81,27 @@ export class CuckooSearch extends Algorithm {
     }
 
     // 2. Abandonment
-    // Sort to find worst
+    // Sort to find worst (highest values)
     const sorted = this.particles
       .map((p, i) => ({ val: p.val, idx: i }))
       .sort((a, b) => b.val - a.val);
     const numAbandon = Math.floor(this.particles.length * Pa);
 
+    // Find current best index to protect it (Elitism)
+    // We scan the current state because particles might have moved during Lévy flights
+    let bestIdx = -1;
+    let minVal = Infinity;
+    for (let i = 0; i < this.particles.length; i++) {
+      if (this.particles[i].val < minVal) {
+        minVal = this.particles[i].val;
+        bestIdx = i;
+      }
+    }
+
     for (let k = 0; k < numAbandon; k++) {
       const idx = sorted[k].idx;
       // Elitism: don't abandon the absolute best
-      if (Math.abs(this.particles[idx].val - this.best.val) < 1e-9) continue;
+      if (idx === bestIdx) continue;
 
       const rx = (RNG.next() * 2 - 1) * b;
       const rz = (RNG.next() * 2 - 1) * b;
