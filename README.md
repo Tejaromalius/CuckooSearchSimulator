@@ -28,25 +28,33 @@ Explore agents interacting with complex objective functions, each rendered in in
 
 ### 🛠️ Interactive Controls
 
-* **Real-time Parameter Tuning:** Adjust algorithm-specific parameters (e.g., Mutation Rate, Inertia, Discovery Rate) on the fly without restarting.
-* **Simulation Controls:** Play, Pause, Reset, and adjust simulation speed.
-* **Visual Aids:** Toggle Heatmaps and Auto-Rotation.
+*   **Real-time Parameter Tuning:** Adjust algorithm-specific parameters (e.g., Mutation Rate, Inertia, Discovery Rate) and landscape parameters (e.g., Schwefel Frequency, Ackley Amplitude) on the fly without restarting.
+*   **Simulation Controls:** 
+    -   **Play/Pause:** Run the simulation continuously at your desired speed
+    -   **Step:** Execute one generation at a time for detailed analysis
+    -   **Reset:** Restart the simulation from generation 0
+*   **Visual Aids:** Toggle Heatmaps and Auto-Rotation.
 
 ### 📊 Analytics & Data
 
-* **Live Charts:** Real-time plotting of convergence (Best Fitness vs. Generation).
-* **Statistical Dashboard:** Live metrics for Population Diversity (Std Dev), Average Fitness, and Success Rate.
-* **Export:** Download simulation data as CSV for external analysis.
-* **Comparison Mode:** Run benchmarks to compare the performance of the current algorithm configuration.
+*   **Live Charts:** Real-time plotting of convergence (Best Fitness vs. Generation).
+*   **Statistical Dashboard:** Live metrics for Population Diversity (Std Dev), Average Fitness, and Success Rate.
+*   **Export:** Download simulation data as CSV for external analysis.
+*   **Comparison Mode:** Run benchmarks to compare the performance of the current algorithm configuration.
 
 ### 📱 Mobile Support
 
-* **Fully Responsive:** Optimized for phones, tablets, and desktops with adaptive layouts.
-* **Touch Controls:** Slide-out drawer navigation with touch-optimized controls (48px tap targets).
-* **Gesture Support:** Pinch-to-zoom, drag-to-rotate, and two-finger pan on 3D canvas.
-* **Performance Optimized:** Automatic particle count reduction on mobile devices.
-* **PWA Ready:** Install as a standalone app on iOS and Android.
-* **Orientation Aware:** Adapts to portrait and landscape modes seamlessly.
+*   **Fully Responsive:** Optimized for phones, tablets, and desktops with adaptive layouts.
+*   **Fullscreen Mode:** Dedicated fullscreen button (⛶) for immersive 3D viewing on mobile devices in landscape orientation.
+*   **Touch Controls:** Smooth, responsive sliders with `touch-action` optimization to prevent scroll conflicts.
+*   **Gesture Support:** Pinch-to-zoom, drag-to-rotate, and two-finger pan on 3D canvas.
+*   **Adaptive Rendering:** 
+    -   Camera, lighting, and fog automatically scale based on landscape size
+    -   Particle and beacon sizes adjust dynamically for visibility across all terrains
+    -   Optimized geometry recycling for smooth real-time parameter updates
+*   **Performance Optimized:** Automatic particle count reduction on mobile devices.
+*   **PWA Ready:** Install as a standalone app on iOS and Android.
+*   **Orientation Aware:** Adapts to portrait and landscape modes seamlessly with landscape-specific UI density.
 
 📖 **[Read the Mobile Guide](MOBILE.md)** for detailed usage instructions.
 
@@ -243,11 +251,12 @@ $$f(x, z) = (a - x)^2 + b(z - x^2)^2$$
 
 #### 2.4 Schwefel Function
 
-Complex function with many local minima. The global minimum is far from the next best local minima.
+Complex function with many local minima. The global minimum is far from the next best local minima. This implementation includes an interactive **frequency parameter** that allows you to adjust the "waviness" of the landscape, creating more or fewer local minima for experimentation.
 
-$$f(x, z) = 418.9829 \times 2 - (x \sin(\sqrt{|x|}) + z \sin(\sqrt{|z|}))$$
+$$f(x, z) = 418.9829 \times 2 - (x \sin(\sqrt{|x \cdot freq|}) + z \sin(\sqrt{|z \cdot freq|}))$$
 
-* **Global Minimum:** $0$ at $(420.9687, 420.9687)$.
+* **Global Minimum:** $0$ at $(420.9687, 420.9687)$ (at standard frequency = 1.0).
+* **Interactive Parameters:** Vertical Offset (200-600), Frequency/Waviness (0.5-2.0).
 
 #### 2.5 Sphere Function
 
