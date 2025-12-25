@@ -62,8 +62,31 @@ STATE.keepHistory = false; // Track comparison mode
 let activeLandscape = LANDSCAPES.ackley;
 let activeAlgorithm = ALGORITHMS.cuckoo;
 
-function switchLandscape(id) {
+async function switchLandscape(id) {
   if (!LANDSCAPES[id]) return;
+
+  // Warning when changing landscape in comparison mode
+  if (STATE.keepHistory) {
+    const confirmed = await showConfirmationDialog(
+      '⚠️ Clear Comparison Data?',
+      'Changing the landscape type or terrain parameters will clear all previous simulation runs as comparison data is no longer valid.',
+    );
+    if (!confirmed) {
+      // Revert the select dropdown
+      document.getElementById('landscape-select').value =
+        STATE.currentLandscape;
+      return;
+    }
+    // If they continue, we MUST clear history
+    STATE.keepHistory = false;
+    const compBtn = document.getElementById('btn-compare');
+    if (compBtn) {
+      compBtn.innerText = '📊 Compare Current Algorithm';
+      compBtn.style.background = '';
+      compBtn.style.color = '';
+    }
+  }
+
   activeLandscape = LANDSCAPES[id];
   STATE.currentLandscape = id;
   terrainMgr.setLandscape(activeLandscape);
@@ -166,6 +189,10 @@ function reset(keepPrevious = false) {
     algoParams: JSON.parse(
       JSON.stringify(STATE.algoParams[STATE.currentAlgorithm]),
     ),
+    // Landscape-specific parameters
+    landParams: JSON.parse(
+      JSON.stringify(STATE.landscapeParams[STATE.currentLandscape]),
+    ),
   };
   statsMgr.reset(keepPrevious, meta);
   heatmapMgr.reset();
@@ -213,6 +240,12 @@ document.getElementById('btn-compare').addEventListener('click', (e) => {
   e.target.innerText = 'Comparing... (Reset to Exit)';
   e.target.style.background = '#00f260';
   e.target.style.color = '#000';
+
+  // Snapshot current parameters when entering comparison mode
+  paramSnapshot = JSON.parse(
+    JSON.stringify(STATE.landscapeParams[STATE.currentLandscape]),
+  );
+
   // Do NOT called reset(true) here.
   // We just enable the mode. The actual reset/save happens when
   // the user changes a parameter or clicks Reset manually.
@@ -273,6 +306,101 @@ function showGenerationLimitWarning() {
     warning.style.transition = 'all 0.3s ease';
     setTimeout(() => warning.remove(), 300);
   }, 3000);
+}
+
+// Helper function to show custom confirmation dialog
+function showConfirmationDialog(title, message) {
+  return new Promise((resolve) => {
+    const backdrop = document.createElement('div');
+    backdrop.style.cssText = `
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(5px);
+      -webkit-backdrop-filter: blur(5px);
+      z-index: 10000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    `;
+
+    const dialog = document.createElement('div');
+    dialog.style.cssText = `
+      background: linear-gradient(135deg, rgba(255, 150, 50, 0.95), rgba(200, 80, 0, 0.95));
+      color: white;
+      padding: 25px 35px;
+      border-radius: 12px;
+      border: 2px solid rgba(255, 150, 100, 0.8);
+      box-shadow: 0 8px 32px rgba(255, 100, 0, 0.4);
+      text-align: center;
+      max-width: 450px;
+      animation: shakeDialog 0.5s ease;
+    `;
+
+    dialog.innerHTML = `
+      <div style="margin-bottom: 20px;">
+        <strong style="font-size: 1.1rem; display: block; margin-bottom: 12px;">${title}</strong>
+        <p style="line-height: 1.6; margin: 0;">${message}</p>
+      </div>
+      <div style="display: flex; gap: 15px; justify-content: center;">
+        <button id="confirm-yes" style="
+          padding: 10px 25px;
+          background: rgba(255, 255, 255, 0.2);
+          border: 1px solid rgba(255, 255, 255, 0.5);
+          color: white;
+          border-radius: 6px;
+          cursor: pointer;
+          font-weight: bold;
+          transition: all 0.2s;
+        ">Continue</button>
+        <button id="confirm-no" style="
+          padding: 10px 25px;
+          background: rgba(0, 0, 0, 0.3);
+          border: 1px solid rgba(255, 255, 255, 0.3);
+          color: white;
+          border-radius: 6px;
+          cursor: pointer;
+          font-weight: bold;
+          transition: all 0.2s;
+        ">Cancel</button>
+      </div>
+    `;
+
+    backdrop.appendChild(dialog);
+    document.body.appendChild(backdrop);
+
+    const cleanup = () => {
+      backdrop.style.opacity = '0';
+      backdrop.style.transition = 'opacity 0.3s ease';
+      setTimeout(() => backdrop.remove(), 300);
+    };
+
+    dialog.querySelector('#confirm-yes').addEventListener('click', () => {
+      cleanup();
+      resolve(true);
+    });
+
+    dialog.querySelector('#confirm-no').addEventListener('click', () => {
+      cleanup();
+      resolve(false);
+    });
+
+    // Hover effects
+    const buttons = dialog.querySelectorAll('button');
+    buttons.forEach((btn) => {
+      btn.addEventListener('mouseenter', () => {
+        btn.style.transform = 'translateY(-2px)';
+        btn.style.boxShadow = '0 4px 12px rgba(255, 255, 255, 0.3)';
+      });
+      btn.addEventListener('mouseleave', () => {
+        btn.style.transform = 'translateY(0)';
+        btn.style.boxShadow = 'none';
+      });
+    });
+  });
 }
 
 document.getElementById('btn-step').addEventListener('click', () => {
@@ -385,10 +513,63 @@ document.getElementById('inp-max-gen').addEventListener('change', (e) => {
 });
 
 // Helper for dynamic param events (bubbled from modules)
-document.addEventListener(EVENTS.UPDATE_PARAMS, () => {
+let isProcessingParamChange = false;
+let paramSnapshot = null;
+
+document.addEventListener(EVENTS.UPDATE_PARAMS, async () => {
+  // Prevent re-entry (multiple dialogs)
+  if (isProcessingParamChange) return;
+  isProcessingParamChange = true;
+
+  // Warning when changing landscape params in comparison mode
+  if (STATE.keepHistory) {
+    // Ensure we have a snapshot (should have been created when comparison mode enabled)
+    if (!paramSnapshot) {
+      console.warn(
+        'No param snapshot found - comparison mode may not have been properly initialized',
+      );
+    }
+
+    const confirmed = await showConfirmationDialog(
+      '⚠️ Clear Comparison Data?',
+      'Changing terrain parameters will clear all previous simulation runs as comparison data is no longer valid.',
+    );
+
+    if (!confirmed) {
+      // Restore the old parameters from snapshot (if we have one)
+      if (paramSnapshot) {
+        STATE.landscapeParams[STATE.currentLandscape] = JSON.parse(
+          JSON.stringify(paramSnapshot),
+        );
+      }
+      isProcessingParamChange = false;
+
+      // Rebuild with old values
+      terrainMgr.rebuild();
+      heatmapMgr.buildMesh(activeLandscape);
+
+      // Re-sync UI controls to show the reverted values
+      updateControls();
+      return;
+    }
+
+    // User confirmed - update snapshot to new confirmed state and exit comparison mode
+    paramSnapshot = JSON.parse(
+      JSON.stringify(STATE.landscapeParams[STATE.currentLandscape]),
+    );
+    STATE.keepHistory = false;
+    const compBtn = document.getElementById('btn-compare');
+    if (compBtn) {
+      compBtn.innerText = '📊 Compare Current Algorithm';
+      compBtn.style.background = '';
+      compBtn.style.color = '';
+    }
+  }
+
   terrainMgr.rebuild();
   heatmapMgr.buildMesh(activeLandscape);
   stopAndReset();
+  isProcessingParamChange = false;
 });
 
 // Algorithm parameter changes trigger new run (stopped)

@@ -343,7 +343,7 @@ export class StatsManager {
     if (allData.length === 0) return;
 
     let csv =
-      'RunID,Algorithm,Landscape,PopSize,Epsilon,Seed,AlgoParams,Generation,BestFitness,AvgFitness,StdDev,SuccessRate\n';
+      'RunID,Algorithm,Landscape,PopSize,Epsilon,Seed,AlgoParams,LandParams,Generation,BestFitness,AvgFitness,StdDev,SuccessRate\n';
 
     allData.forEach((run) => {
       const m = run.meta || {};
@@ -354,12 +354,17 @@ export class StatsManager {
       const seed = m.seed || 0;
       const algoParams = m.algoParams
         ? Object.entries(m.algoParams)
-          .map(([key, val]) => `${key}=${val}`)
-          .join(';')
+            .map(([key, val]) => `${key}=${val}`)
+            .join(';')
+        : 'none';
+      const landParams = m.landParams
+        ? Object.entries(m.landParams)
+            .map(([key, val]) => `${key}=${val}`)
+            .join(';')
         : 'none';
 
       run.data.forEach((r) => {
-        csv += `${run.runId},${algo},${land},${pop},${eps},${seed},"${algoParams}",${r.gen},${r.best},${r.avg},${r.stdDev},${r.success}\n`;
+        csv += `${run.runId},${algo},${land},${pop},${eps},${seed},"${algoParams}","${landParams}",${r.gen},${r.best},${r.avg},${r.stdDev},${r.success}\n`;
       });
     });
 
