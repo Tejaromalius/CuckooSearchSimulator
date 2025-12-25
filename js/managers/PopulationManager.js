@@ -56,27 +56,27 @@ export class PopulationManager {
    */
   scaleAssets(landscape) {
     const b = landscape.bounds;
-    // Base scale is 1 for bounds ~ 5-10
-    // Scale up linearly but with a floor
-    const s = Math.max(0.5, b / 10);
+    // Use logarithmic scaling with a cap to prevent massive beacons
+    // For bounds 5: s ≈ 1, for bounds 500: s ≈ 3.5 (much more reasonable)
+    const s = Math.min(5, 0.5 + Math.log10(b));
 
     // Update the base meshes
     this.meshes.forEach((m) => {
       m.scale.set(s, s, s);
     });
 
-    // Update the beacon
-    this.beacon.scale.set(s, s, s);
-    // Beacon height also needs adjustment
+    // Update the beacon with conservative sizing
+    this.beacon.scale.set(1, 1, 1); // Reset scale first
     this.beacon.geometry.dispose();
-    this.beacon.geometry = new THREE.CylinderGeometry(0, 0.2 * s, 4 * s, 8);
+    // Keep beacon proportional but not overwhelming
+    this.beacon.geometry = new THREE.CylinderGeometry(0, 0.3 * s, 3 * s, 8);
   }
 
   update(particles, landscape, best) {
     const hScale = landscape.hScale;
     const off = landscape.visOffset;
     const b = landscape.bounds;
-    const s = Math.max(0.5, b / 10); // Match scaleAssets logic
+    const s = Math.min(5, 0.5 + Math.log10(b)); // Match scaleAssets logic
 
     particles.forEach((p, i) => {
       if (!this.meshes[i]) return;
