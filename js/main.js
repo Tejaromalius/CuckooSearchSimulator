@@ -97,6 +97,7 @@ function switchLandscape(id) {
     camera.updateProjectionMatrix();
   }
 
+  updateControls();
   reset(STATE.keepHistory);
 }
 
@@ -104,6 +105,7 @@ function switchAlgorithm(id) {
   if (!ALGORITHMS[id]) return;
   activeAlgorithm = ALGORITHMS[id];
   STATE.currentAlgorithm = id;
+  updateControls();
   reset(STATE.keepHistory);
 }
 
@@ -146,8 +148,6 @@ function reset(keepPrevious = false) {
   };
   statsMgr.reset(keepPrevious, meta);
   heatmapMgr.reset();
-
-  updateControls();
 }
 
 // --- MOBILE OPTIMIZATIONS ---
@@ -280,6 +280,7 @@ window.addEventListener('resize', () => {
 
 // --- LOOP ---
 // Initial build
+updateControls();
 switchLandscape('ackley'); // also triggers reset
 
 let lastTime = 0;

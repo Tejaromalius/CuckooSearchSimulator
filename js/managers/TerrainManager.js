@@ -16,100 +16,121 @@ export class TerrainManager {
   }
 
   rebuild() {
-    // Cleanup existing meshes
-    if (this.mesh) {
-      this.scene.remove(this.mesh);
-      this.mesh.geometry.dispose();
-      this.mesh.material.dispose();
-    }
-    if (this.heatmapMesh) {
-      this.scene.remove(this.heatmapMesh);
-      // Geometry is shared with mesh, so we only dispose material
-      this.heatmapMesh.material.dispose();
-      this.heatmapMesh = null;
-    }
-
     const l = this.landscape;
+    if (!l) return;
+
     const size = l.bounds * 2;
     const segments = 128; // High res
-    const geo = new THREE.PlaneGeometry(size, size, segments, segments);
 
+    // 1. Initial creation or full resize
+    if (!this.mesh || this._lastBounds !== l.bounds) {
+      this._cleanup();
+      const geo = new THREE.PlaneGeometry(size, size, segments, segments);
+
+      const mat = new THREE.MeshPhongMaterial({
+        vertexColors: true,
+        shininess: 15,
+        specular: 0x222222,
+        side: THREE.DoubleSide,
+        transparent: false,
+      });
+
+      this.mesh = new THREE.Mesh(geo, mat);
+      this.mesh.rotation.x = -Math.PI / 2;
+      this.scene.add(this.mesh);
+
+      const overlayMat = new THREE.MeshBasicMaterial({
+        map: null,
+        transparent: true,
+        opacity: 1,
+        side: THREE.DoubleSide,
+        depthWrite: false,
+        color: 0xffffff,
+      });
+
+      this.heatmapMesh = new THREE.Mesh(geo, overlayMat);
+      this.heatmapMesh.rotation.x = -Math.PI / 2;
+      this.heatmapMesh.position.y = 0.05;
+      this.heatmapMesh.visible = false;
+      this.scene.add(this.heatmapMesh);
+
+      this._lastBounds = l.bounds;
+    }
+
+    // 2. Perform the actual vertex calculations (Fast Path)
+    this._updateAttributes();
+
+    // Restore pending state
+    if (this._pendingTexture) {
+      this.setHeatmap(this._pendingTexture);
+    }
+  }
+
+  _updateAttributes() {
+    const l = this.landscape;
+    const geo = this.mesh.geometry;
     const pos = geo.attributes.position;
+    const colorsAttr =
+      geo.attributes.color ||
+      new THREE.Float32BufferAttribute(pos.count * 3, 3);
+
     let maxVal = -Infinity;
     let minVal = Infinity;
 
-    // 1. Calculate Range
+    // Cache values to avoid double calculation
+    const heightMap = new Float32Array(pos.count);
     for (let i = 0; i < pos.count; i++) {
-      const z = l.f(pos.getX(i), pos.getY(i));
-      if (z > maxVal) maxVal = z;
-      if (z < minVal) minVal = z;
+      const val = l.f(pos.getX(i), pos.getY(i));
+      heightMap[i] = val;
+      if (val > maxVal) maxVal = val;
+      if (val < minVal) minVal = val;
     }
 
     const colors = [];
     const cLow = new THREE.Color(l.colors[0]);
     const cHigh = new THREE.Color(l.colors[1]);
 
-    // 2. setZ and colors
     for (let i = 0; i < pos.count; i++) {
-      const val = l.f(pos.getX(i), pos.getY(i));
-
-      // Visual Height
+      const val = heightMap[i];
       pos.setZ(i, val * l.hScale + l.visOffset);
 
-      // Color Interpolation
       let t = 0;
       if (l.id === 'rosenbrock' || l.id === 'schwefel') {
         const safeVal = Math.max(val, 0.0001);
-        if (maxVal === minVal) t = 0;
+        const safeMin = Math.max(minVal, 0.0001);
+        const safeMax = Math.max(maxVal, 0.0001);
+        if (safeMax === safeMin) t = 0;
         else
           t =
-            (Math.log(safeVal) - Math.log(Math.max(minVal, 0.0001))) /
-            (Math.log(maxVal) - Math.log(Math.max(minVal, 0.0001)));
+            (Math.log(safeVal) - Math.log(safeMin)) /
+            (Math.log(safeMax) - Math.log(safeMin));
       } else {
         t = (val - minVal) / (maxVal - minVal || 1);
       }
-      t = Math.max(0, Math.min(1, t)); // Clamp
+      t = Math.max(0, Math.min(1, t));
 
       const c = new THREE.Color().lerpColors(cLow, cHigh, t);
-      colors.push(c.r, c.g, c.b);
+      colorsAttr.setXYZ(i, c.r, c.g, c.b);
     }
 
+    pos.needsUpdate = true;
+    if (!geo.attributes.color) geo.setAttribute('color', colorsAttr);
+    else colorsAttr.needsUpdate = true;
+
     geo.computeVertexNormals();
-    geo.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
+  }
 
-    // 1. Base Mesh (Terrain Colors) - Responsive and Balanced
-    const mat = new THREE.MeshPhongMaterial({
-      vertexColors: true,
-      shininess: 15,
-      specular: 0x222222,
-      side: THREE.DoubleSide,
-      transparent: false,
-    });
-
-    this.mesh = new THREE.Mesh(geo, mat);
-    this.mesh.rotation.x = -Math.PI / 2;
-    this.scene.add(this.mesh);
-
-    // 2. Overlay Mesh (Heatmap Only) - Transparent
-    const overlayMat = new THREE.MeshBasicMaterial({
-      map: null,
-      transparent: true,
-      opacity: 1, // Will show texture opacity
-      side: THREE.DoubleSide,
-      depthWrite: false, // Prevents z-fighting and ensures overlay behavior
-      color: 0xffffff,
-      alphaTest: 0, // No alpha test needed, use proper blending
-    });
-
-    this.heatmapMesh = new THREE.Mesh(geo, overlayMat); // Re-use geometry
-    this.heatmapMesh.rotation.x = -Math.PI / 2;
-    this.heatmapMesh.position.y = 0.05; // Offset slightly above to sit on top
-    this.heatmapMesh.visible = false;
-    this.scene.add(this.heatmapMesh);
-
-    // Restore pending state
-    if (this._pendingTexture) {
-      this.setHeatmap(this._pendingTexture);
+  _cleanup() {
+    if (this.mesh) {
+      this.scene.remove(this.mesh);
+      this.mesh.geometry.dispose();
+      this.mesh.material.dispose();
+      this.mesh = null;
+    }
+    if (this.heatmapMesh) {
+      this.scene.remove(this.heatmapMesh);
+      this.heatmapMesh.material.dispose();
+      this.heatmapMesh = null;
     }
   }
 
