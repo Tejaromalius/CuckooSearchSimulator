@@ -777,6 +777,7 @@ if (musicToggle) {
 }
 
 // Unmute and play on first user interaction
+// Unmute and play on first user interaction
 const enableAudio = () => {
   bgMusic.muted = false;
   bgMusic
@@ -784,21 +785,24 @@ const enableAudio = () => {
     .then(() => {
       isMusicPlaying = true;
       updateMusicUI();
+      // ONLY remove listeners if playback actually started successfully
+      ['click', 'keydown', 'touchstart', 'touchend', 'pointerdown'].forEach(
+        (evt) =>
+          document.removeEventListener(evt, enableAudio, { capture: true }),
+      );
     })
-    .catch(() => {
+    .catch((err) => {
+      // If blocked (e.g., scrolling on touchstart), keep listeners active
       isMusicPlaying = false;
       updateMusicUI();
     });
-  // Remove all listeners after first interaction
-  ['click', 'keydown', 'touchstart', 'touchend', 'pointerdown'].forEach((evt) =>
-    document.removeEventListener(evt, enableAudio, { capture: true }),
-  );
 };
 
 // Register interaction listeners to unmute audio
 // Use capture: true to catch events before controls/canvas consume them
+// Do NOT use { once: true } here, because we handle removal manually upon success
 ['click', 'keydown', 'touchstart', 'touchend', 'pointerdown'].forEach((evt) =>
-  document.addEventListener(evt, enableAudio, { once: true, capture: true }),
+  document.addEventListener(evt, enableAudio, { capture: true }),
 );
 
 updateMusicUI();
