@@ -741,4 +741,54 @@ function animate(time) {
   controls.update();
   renderer.render(scene, camera);
 }
+// --- BACKGROUND MUSIC ---
+const bgMusic = document.getElementById('bg-music');
+const musicToggle = document.getElementById('btn-music-toggle');
+let isMusicPlaying = false;
+
+function updateMusicUI() {
+  musicToggle.innerText = isMusicPlaying ? '🔊' : '🔇';
+}
+
+function toggleMusic() {
+  if (isMusicPlaying) {
+    bgMusic.pause();
+    isMusicPlaying = false;
+  } else {
+    bgMusic.play().then(() => {
+      isMusicPlaying = true;
+    }).catch((err) => {
+      console.warn('Playback blocked by browser:', err);
+      isMusicPlaying = false;
+    });
+  }
+  updateMusicUI();
+}
+
+if (musicToggle) {
+  musicToggle.addEventListener('click', toggleMusic);
+}
+
+// Attempt autoplay immediately
+const tryAutoplay = () => {
+  bgMusic.play().then(() => {
+    isMusicPlaying = true;
+    updateMusicUI();
+    // Success, remove listeners
+    ['click', 'keydown', 'touchstart', 'mousemove', 'scroll'].forEach(evt =>
+      document.removeEventListener(evt, tryAutoplay)
+    );
+  }).catch(() => {
+    // Blocked, keep listeners to play on first interaction
+  });
+};
+
+// Initial attempt
+tryAutoplay();
+
+// Fallback for strict browsers - catch ANY interaction
+['click', 'keydown', 'touchstart', 'mousemove', 'scroll'].forEach(evt =>
+  document.addEventListener(evt, tryAutoplay, { once: true })
+);
+
 animate(0);

@@ -26,7 +26,10 @@ const ASSETS = [
   'https://cdn.jsdelivr.net/npm/chart.js',
   'https://cdn.jsdelivr.net/npm/hammerjs@2.0.8',
   'https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom',
-  'https://unpkg.com/three@0.160.0/build/three.module.js'
+  'https://unpkg.com/three@0.160.0/build/three.module.js',
+  './assets/sound.mp3',
+  './assets/icons/icon-192x192.png',
+  './assets/icons/icon-512x512.png'
 ];
 
 self.addEventListener('install', (event) => {

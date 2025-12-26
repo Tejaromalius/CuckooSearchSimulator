@@ -14,7 +14,7 @@
     />
     <meta name="theme-color" content="#050505" />
     <title>Optimization Algorithm Playground</title>
-    <link rel="icon" href="icons/icon-192x192.png" type="image/png" />
+    <link rel="icon" href="assets/icons/icon-192x192.png" type="image/png" />
     <link rel="stylesheet" href="css/style.css" />
     <!-- Chart.js for analytics -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -36,6 +36,19 @@
     </script>
   </head>
   <body>
+    <!-- Background Audio -->
+    <audio id="bg-music" loop autoplay preload="auto">
+      <source src="assets/sound.mp3" type="audio/mpeg" />
+    </audio>
+
+    <button
+      id="btn-music-toggle"
+      class="modern-mini-btn"
+      style="bottom: 20px; left: 20px; top: auto; right: auto; z-index: 1000"
+      title="Toggle Background Music"
+    >
+      🔇
+    </button>
     <!-- Rotate Device Prompt (Portrait Mode Only) -->
     <div id="rotate-prompt">
       <div class="rotate-prompt-content">
