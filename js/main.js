@@ -752,15 +752,22 @@ function updateMusicUI() {
 
 function toggleMusic() {
   if (isMusicPlaying) {
+    bgMusic.muted = true;
     bgMusic.pause();
     isMusicPlaying = false;
   } else {
-    bgMusic.play().then(() => {
-      isMusicPlaying = true;
-    }).catch((err) => {
-      console.warn('Playback blocked by browser:', err);
-      isMusicPlaying = false;
-    });
+    bgMusic.muted = false;
+    bgMusic
+      .play()
+      .then(() => {
+        isMusicPlaying = true;
+        updateMusicUI();
+      })
+      .catch((err) => {
+        console.warn('Playback blocked by browser:', err);
+        isMusicPlaying = false;
+        updateMusicUI();
+      });
   }
   updateMusicUI();
 }
@@ -769,26 +776,30 @@ if (musicToggle) {
   musicToggle.addEventListener('click', toggleMusic);
 }
 
-// Attempt autoplay immediately
-const tryAutoplay = () => {
-  bgMusic.play().then(() => {
-    isMusicPlaying = true;
-    updateMusicUI();
-    // Success, remove listeners
-    ['click', 'keydown', 'touchstart', 'mousemove', 'scroll'].forEach(evt =>
-      document.removeEventListener(evt, tryAutoplay)
-    );
-  }).catch(() => {
-    // Blocked, keep listeners to play on first interaction
-  });
+// Unmute and play on first user interaction
+const enableAudio = () => {
+  bgMusic.muted = false;
+  bgMusic
+    .play()
+    .then(() => {
+      isMusicPlaying = true;
+      updateMusicUI();
+    })
+    .catch(() => {
+      isMusicPlaying = false;
+      updateMusicUI();
+    });
+  // Remove all listeners after first interaction
+  ['click', 'keydown', 'touchstart'].forEach((evt) =>
+    document.removeEventListener(evt, enableAudio),
+  );
 };
 
-// Initial attempt
-tryAutoplay();
-
-// Fallback for strict browsers - catch ANY interaction
-['click', 'keydown', 'touchstart', 'mousemove', 'scroll'].forEach(evt =>
-  document.addEventListener(evt, tryAutoplay, { once: true })
+// Register interaction listeners to unmute audio
+['click', 'keydown', 'touchstart'].forEach((evt) =>
+  document.addEventListener(evt, enableAudio, { once: true }),
 );
+
+updateMusicUI();
 
 animate(0);

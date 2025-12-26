@@ -37,7 +37,7 @@
   </head>
   <body>
     <!-- Background Audio -->
-    <audio id="bg-music" loop autoplay preload="auto">
+    <audio id="bg-music" loop autoplay muted preload="auto">
       <source src="assets/sound.mp3" type="audio/mpeg" />
     </audio>
 
@@ -356,7 +356,9 @@
       <div class="algo-info-content">
         <div class="algo-info-header">
           <h3 id="algo-info-title">Algorithm Name</h3>
-          <button id="algo-info-close" type="button" aria-label="Close">✕</button>
+          <button id="algo-info-close" type="button" aria-label="Close">
+            ✕
+          </button>
         </div>
         <div class="algo-info-body">
           <p id="algo-info-text"></p>

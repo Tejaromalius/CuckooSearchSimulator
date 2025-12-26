@@ -944,7 +944,9 @@ button.active {
   color: #4facfe;
   font-size: 0.85rem;
   cursor: pointer;
-  transition: background 0.2s, transform 0.2s;
+  transition:
+    background 0.2s,
+    transform 0.2s;
 }
 
 .info-icon:hover {
@@ -992,7 +994,9 @@ button.active {
   color: #777;
   font-size: 1rem;
   cursor: pointer;
-  transition: color 0.2s, background 0.2s;
+  transition:
+    color 0.2s,
+    background 0.2s;
 }
 
 .algo-info-header button:hover {
@@ -1016,11 +1020,9 @@ button.active {
   .algo-info-content {
     width: 95%;
   }
-  
+
   .algo-info-body {
     padding: 16px;
     font-size: 0.88rem;
   }
 }
-
-
