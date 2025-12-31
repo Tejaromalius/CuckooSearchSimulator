@@ -1,6 +1,10 @@
-# Cuckoo Search Simulator and Optimization Playground
+<p align="center">
+  <img src="assets/logo.png" width="200" alt="OptiScape Logo">
+</p>
 
-A high-performance, interactive 3D visualization tool for studying metaheuristic optimization algorithms. This project provides a "playground" environment where students and researchers can visualize how different algorithms (like Cuckoo Search, PSO, and Genetic Algorithms) navigate complex mathematical landscapes in real-time.
+# OptiScape - Optimization Algorithm Playground
+
+A high-performance, interactive 3D visualization tool for studying metaheuristic optimization algorithms. OptiScape provides an immersive "playground" environment where students and researchers can visualize how different algorithms (like Cuckoo Search, PSO, and Genetic Algorithms) navigate complex mathematical landscapes in real-time.
 
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 ![Technology](https://img.shields.io/badge/tech-Three.js%20%7C%20Chart.js%20%7C%20Vanilla%20JS-yellow)
@@ -10,11 +14,12 @@ A high-performance, interactive 3D visualization tool for studying metaheuristic
 
 ### 🧠 Implemented Algorithms
 
-* **Cuckoo Search (CS):** Visualizes random Lévy flight walks and nest abandonment mechanics.
+* **Cuckoo Search (CS):** Visualizes random Lévy flight walks and nest abandonment mechanics using the original selection logic.
 * **Particle Swarm Optimization (PSO):** Demonstrates flocking behaviors with customizable inertia and social/cognitive coefficients.
-* **Genetic Algorithm (GA):** Shows population evolution through selection, crossover, and mutation.
+* **Genetic Algorithm (GA):** Shows population evolution with multiple selection methods (Tournament, Roulette Wheel, Rank-based) and crossover strategies (Arithmetic, Uniform, Blend).
 * **Simulated Annealing (SA):** Visualizes temperature-based exploration vs. exploitation.
 * **Random Search:** A baseline for comparison.
+* **Interactive Info:** Each algorithm includes a detailed scientific description accessible via the info button (ℹ️) in the UI.
 
 ### 🏔️ 3D Mathematical Landscapes
 
@@ -38,13 +43,25 @@ Explore agents interacting with complex objective functions, each rendered in in
 ### 📊 Analytics & Data
 
 *   **Live Charts:** Real-time plotting of convergence (Best Fitness vs. Generation).
-*   **Statistical Dashboard:** Live metrics for Population Diversity (Std Dev), Average Fitness, and Success Rate.
-*   **Export:** Download simulation data as CSV for external analysis.
-*   **Comparison Mode:** Run benchmarks to compare the performance of the current algorithm configuration.
+*   **Statistical Dashboard:** Live metrics including:
+    -   Population Diversity (Standard Deviation)
+    -   Average Fitness
+    -   Success Rate (standardized across all landscapes)
+    -   Total Generations counter
+*   **Enhanced Export:** Download comprehensive simulation data as CSV including:
+    -   Algorithm-specific parameters (e.g., GA selection method, crossover method, mutation rate)
+    -   Landscape parameters (e.g., Schwefel frequency, Ackley amplitude)
+    -   Complete generation-by-generation statistics
+*   **Comparison Mode:** Run benchmarks to compare the performance of different algorithm configurations.
 
-### 📱 Mobile Support
+### 📱 Mobile Support & PWA
 
 *   **Fully Responsive:** Optimized for phones, tablets, and desktops with adaptive layouts.
+*   **Progressive Web App (PWA):**
+    -   **Install as Native App:** Add to home screen on iOS and Android for standalone experience
+    -   **Offline Support:** Service worker caching for reliable offline functionality
+    -   **Fullscreen Display:** Automatic fullscreen mode with standalone display override
+    -   **App Icons:** Custom 192x192 and 512x512 maskable icons
 *   **Fullscreen Mode:** Dedicated fullscreen button (⛶) for immersive 3D viewing on mobile devices in landscape orientation.
 *   **Touch Controls:** Smooth, responsive sliders with `touch-action` optimization to prevent scroll conflicts.
 *   **Gesture Support:** Pinch-to-zoom, drag-to-rotate, and two-finger pan on 3D canvas.
@@ -53,8 +70,14 @@ Explore agents interacting with complex objective functions, each rendered in in
     -   Particle and beacon sizes adjust dynamically for visibility across all terrains
     -   Optimized geometry recycling for smooth real-time parameter updates
 *   **Performance Optimized:** Automatic particle count reduction on mobile devices.
-*   **PWA Ready:** Install as a standalone app on iOS and Android.
 *   **Orientation Aware:** Adapts to portrait and landscape modes seamlessly with landscape-specific UI density.
+
+### 🎵 Audio & Immersion
+
+*   **Background Music:** Ambient background music that enhances the visualization experience
+*   **Sound Effects:** Cuckoo sound effect when using the Cuckoo Search algorithm
+*   **Music Toggle:** Easy-to-use toggle button to enable/disable audio
+*   **Auto-play Support:** Intelligent audio initialization with browser auto-play policy compliance
 
 📖 **[Read the Mobile Guide](MOBILE.md)** for detailed usage instructions.
 
@@ -80,8 +103,8 @@ Explore agents interacting with complex objective functions, each rendered in in
 1. **Clone the repository:**
 
     ```bash
-    git clone https://github.com/Tejaromalius/CuckooSearchSimulator.git
-    cd CuckooSearchSimulator
+    git clone https://github.com/Tejaromalius/OptiScape.git
+    cd OptiScape
     ```
 
 2. **Start the local server:**
@@ -102,6 +125,9 @@ Explore agents interacting with complex objective functions, each rendered in in
 
 ```text
 /
+├── assets/              # Static assets (icons, audio)
+│   ├── icons/           # PWA app icons (192x192, 512x512)
+│   └── sound.mp3        # Background music and sound effects
 ├── css/                 # Styling and UI design
 ├── js/
 │   ├── algorithms/      # Logic for CS, PSO, GA, SA
@@ -112,6 +138,8 @@ Explore agents interacting with complex objective functions, each rendered in in
 │   ├── main.js          # Entry point and Three.js scene setup
 │   └── config.js        # Global configuration and event bus
 ├── index.html           # Application entry point
+├── manifest.json        # PWA manifest for app installation
+├── sw.js                # Service worker for offline support
 ├── package.json         # Script definitions
 └── README.md            # Project documentation
 ```
@@ -190,12 +218,16 @@ Each particle $i$ has position $x_i$ and velocity $v_i$.
 
 **Mathematical Formulation:**
 
-1. **Selection:** Tournament selection ($k=3$) to choose parents.
-2. **Crossover:** Arithmetic crossover with probability $p_c$:
+1. **Selection Methods:**
+    * **Tournament Selection:** $(k=3)$ randomly selected individuals compete, best wins.
+    * **Roulette Wheel Selection:** Fitness-proportionate selection where individuals with higher fitness have greater probability of selection.
+    * **Rank-based Selection:** Selection based on fitness rank rather than absolute fitness values.
 
-    $$Child = \gamma \cdot Parent_1 + (1 - \gamma) \cdot Parent_2$$
+2. **Crossover Strategies:**
+    * **Arithmetic Crossover:** $Child = \gamma \cdot Parent_1 + (1 - \gamma) \cdot Parent_2$, where $\gamma \sim U(0, 1)$.
+    * **Uniform Crossover:** Each gene randomly selected from either parent with equal probability.
+    * **Blend Crossover (BLX-α):** $Child = Parent_1 + \alpha \cdot (Parent_2 - Parent_1)$, where $\alpha \in [-0.5, 1.5]$.
 
-    Where $\gamma \sim U(0, 1)$.
 3. **Mutation:** Uniform mutation with probability $p_m$.
 
     $$x_{new} = x_{old} + \delta, \quad \delta \in [-0.1 \cdot \text{Bounds}, 0.1 \cdot \text{Bounds}]$$

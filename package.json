@@ -1,5 +1,5 @@
 {
-  "name": "optimization-playground",
+  "name": "optiscape",
   "version": "1.0.0",
   "description": "3D Optimization Algorithm Visualization",
   "main": "js/main.js",

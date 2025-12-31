@@ -1,8 +1,8 @@
 {
-  "name": "Cuckoo Search Simulator",
-  "short_name": "CuckooSim",
+  "name": "OptiScape",
+  "short_name": "OptiScape",
   "description": "3D Optimization Algorithm Playground and Simulator",
-  "id": "/cuckoo-search-simulator/",
+  "id": "/optiscape/",
   "start_url": ".",
   "scope": ".",
   "display": "standalone",
