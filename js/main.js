@@ -258,10 +258,12 @@ document
 
 document.getElementById('btn-reset').addEventListener('click', () => {
   STATE.keepHistory = false;
-  document.getElementById('btn-compare').innerText =
-    '📊 Compare Current Algorithm';
-  document.getElementById('btn-compare').style.background = ''; // Reset style
-  reset(false);
+  const compBtn = document.getElementById('btn-compare');
+  if (compBtn) {
+    compBtn.innerText = '📊 Compare Current Algorithm';
+    compBtn.style.background = '';
+  }
+  stopAndReset();
 });
 
 document.getElementById('btn-compare').addEventListener('click', (e) => {
@@ -433,6 +435,9 @@ function showConfirmationDialog(title, message) {
 }
 
 document.getElementById('btn-step').addEventListener('click', () => {
+  // Pause if running
+  pauseSimulation();
+
   // Execute one step manually
   activeAlgorithm.step(activeLandscape);
   popMgr.update(
@@ -489,14 +494,18 @@ document.addEventListener('fullscreenchange', () => {
   }
 });
 
-// Helper: Stop, reset, and update UI (wait for Play)
-function stopAndReset() {
+// Helpers for simulation control
+function pauseSimulation() {
   STATE.isRunning = false;
   const btn = document.getElementById('btn-toggle');
   if (btn) {
     btn.innerText = 'Play';
     btn.classList.remove('active');
   }
+}
+
+function stopAndReset() {
+  pauseSimulation();
   reset(STATE.keepHistory);
 }
 

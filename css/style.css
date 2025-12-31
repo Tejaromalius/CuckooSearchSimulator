@@ -321,17 +321,18 @@ button.active {
 /* ===== SPECIAL BUTTONS ===== */
 #btn-compare {
   background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-  color: #fff;
+  color: #000; /* High contrast: Black on Light Blue */
   cursor: pointer;
   transition: all 0.3s ease;
   text-transform: uppercase;
   letter-spacing: 1px;
-  font-weight: bold;
+  font-weight: 800;
   border: none;
   padding: 12px;
-  border-radius: 6px;
+  border-radius: 8px;
   width: 100%;
-  margin-bottom: 10px;
+  margin-bottom: 15px;
+  box-shadow: 0 4px 15px rgba(79, 172, 254, 0.3);
 }
 
 #btn-compare:hover {
@@ -517,13 +518,14 @@ button.active {
   #btn-compare {
     background: linear-gradient(
       135deg,
-      rgba(79, 172, 254, 0.3) 0%,
-      rgba(0, 242, 254, 0.3) 100%
+      rgba(79, 172, 254, 0.9) 0%,
+      rgba(0, 242, 254, 0.9) 100%
     );
     border: 1px solid rgba(79, 172, 254, 0.4);
-    color: rgba(79, 172, 254, 1);
+    color: #000; /* High contrast for mobile as well */
     width: 100%;
     box-sizing: border-box;
+    font-weight: 800;
   }
 
   #btn-compare:hover {
